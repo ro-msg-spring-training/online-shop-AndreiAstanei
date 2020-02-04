@@ -12,14 +12,14 @@ import java.util.List;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
-    private String FirstName;
-    private String LastName;
-    private String Username;
-    private String Password;
-    private String EmailAddress;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String password;
+    private String emailAddress;
 
-    @OneToMany(mappedBy = "Customer")
+    @OneToMany(mappedBy = "customer")
     private List<Order> orders;
 }

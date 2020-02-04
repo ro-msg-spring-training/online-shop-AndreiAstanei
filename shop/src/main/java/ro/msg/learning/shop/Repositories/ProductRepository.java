@@ -11,6 +11,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-    List<Product> findByName(String name);
+    List<Product> findByNameContaining(String name);
     List<Product> findByCategory(ProductCategory category);
 }

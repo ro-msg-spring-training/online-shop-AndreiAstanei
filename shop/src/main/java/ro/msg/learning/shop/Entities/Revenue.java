@@ -13,10 +13,10 @@ import java.time.LocalDate;
 public class Revenue {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
     @ManyToOne
     private Location location;
-    private LocalDate Date;
-    private BigDecimal Sum;
+    private LocalDate date;
+    private BigDecimal sum;
 }

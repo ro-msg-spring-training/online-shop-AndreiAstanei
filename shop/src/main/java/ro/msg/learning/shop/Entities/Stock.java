@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
     @ManyToOne
     private Product product;
@@ -19,5 +19,5 @@ public class Stock {
     @ManyToOne
     private Location location;
 
-    private Integer Quantity;
+    private Integer quantity;
 }

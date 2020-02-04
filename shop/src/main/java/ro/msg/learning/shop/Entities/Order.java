@@ -14,20 +14,20 @@ import java.util.List;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
     @ManyToOne
-    private Location ShippedFrom;
+    private Location shippedFrom;
 
     @ManyToOne
-    private Customer Customer;
+    private Customer customer;
 
-    private LocalDateTime CreatedAt;
-    private String AddressCountry;
-    private String AddressCity;
-    private String AddressCounty;
-    private String AddressStreetAddress;
+    private LocalDateTime createdAt;
+    private String addressCountry;
+    private String addressCity;
+    private String addressCounty;
+    private String addressStreetAddress;
 
-    @OneToMany(mappedBy = "Order")
+    @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
 }

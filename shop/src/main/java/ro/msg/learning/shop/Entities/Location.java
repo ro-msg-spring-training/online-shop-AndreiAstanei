@@ -12,13 +12,13 @@ import java.util.List;
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
-    private String Name;
-    private String AddressCountry;
-    private String AddressCity;
-    private String AddressCounty;
-    private String AddressStreetAddress;
+    private String name;
+    private String addressCountry;
+    private String addressCity;
+    private String addressCounty;
+    private String addressStreetAddress;
 
     @OneToMany(mappedBy = "location")
     private List<Stock> stocks;
@@ -26,6 +26,6 @@ public class Location {
     @OneToMany(mappedBy = "location")
     private List<Revenue> revenues;
 
-    @OneToMany(mappedBy = "ShippedFrom")
+    @OneToMany(mappedBy = "shippedFrom")
     private List<Order> orders;
 }

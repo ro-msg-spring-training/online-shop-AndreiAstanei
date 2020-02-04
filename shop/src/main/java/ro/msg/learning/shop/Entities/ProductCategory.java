@@ -12,11 +12,11 @@ import java.util.List;
 public class ProductCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
-    private String Name;
-    private String Description;
+    private String name;
+    private String description;
 
-    @OneToMany(mappedBy = "Category")
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 }

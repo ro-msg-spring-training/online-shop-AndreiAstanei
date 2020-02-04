@@ -11,12 +11,12 @@ import javax.persistence.*;
 public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
     @ManyToOne
-    private Order Order;
+    private Order order;
 
     @ManyToOne
-    private Product Product;
-    private Integer Quantity;
+    private Product product;
+    private Integer quantity;
 }

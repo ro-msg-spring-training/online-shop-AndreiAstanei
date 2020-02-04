@@ -13,21 +13,21 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    private Integer id;
 
-    private String Name;
-    private String Description;
-    private BigDecimal Price;
-    private Double Weight;
-    private String ImageUrl;
-
-    @ManyToOne
-    private ProductCategory Category;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Double weight;
+    private String imageUrl;
 
     @ManyToOne
-    private Supplier Supplier;
+    private ProductCategory category;
 
-    @OneToMany(mappedBy = "Product")
+    @ManyToOne
+    private Supplier supplier;
+
+    @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "product")
