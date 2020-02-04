@@ -1,0 +1,9 @@
+package ro.msg.learning.shop.Repositories;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.Transactional;
+
+@Transactional(readOnly = true)
+@EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
+public interface LocationRepository extends JpaRepository<LocationRepository, Integer> {    }

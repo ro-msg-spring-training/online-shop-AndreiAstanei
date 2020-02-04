@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,11 +19,17 @@ public class Product {
     private String Description;
     private BigDecimal Price;
     private Double Weight;
+    private String ImageUrl;
 
     @ManyToOne
     private ProductCategory Category;
 
     @ManyToOne
     private Supplier Supplier;
-    private String ImageUrl;
+
+    @OneToMany(mappedBy = "Product")
+    private List<OrderDetail> orderDetails;
+
+    @OneToMany(mappedBy = "product")
+    private List<Stock> stocks;
 }
