@@ -2,6 +2,7 @@ package ro.msg.learning.shop.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,5 +19,6 @@ public class ProductCategory {
     private String description;
 
     @OneToMany(mappedBy = "category")
+    @ToString.Exclude
     private List<Product> products;
 }

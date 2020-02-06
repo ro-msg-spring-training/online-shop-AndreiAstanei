@@ -2,6 +2,7 @@ package ro.msg.learning.shop.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,7 +16,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Id
     private String name;
+
+    @Id
     private String description;
     private BigDecimal price;
     private Double weight;
@@ -28,8 +32,10 @@ public class Product {
     private Supplier supplier;
 
     @OneToMany(mappedBy = "product")
+    @ToString.Exclude
     private List<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "product")
+    @ToString.Exclude
     private List<Stock> stocks;
 }

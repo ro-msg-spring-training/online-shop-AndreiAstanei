@@ -2,6 +2,7 @@ package ro.msg.learning.shop.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,11 +22,14 @@ public class Location {
     private String addressStreetAddress;
 
     @OneToMany(mappedBy = "location")
+    @ToString.Exclude
     private List<Stock> stocks;
 
     @OneToMany(mappedBy = "location")
+    @ToString.Exclude
     private List<Revenue> revenues;
 
     @OneToMany(mappedBy = "shippedFrom")
+    @ToString.Exclude
     private List<Order> orders;
 }

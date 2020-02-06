@@ -2,6 +2,7 @@ package ro.msg.learning.shop.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,5 +22,6 @@ public class Customer {
     private String emailAddress;
 
     @OneToMany(mappedBy = "customer")
+    @ToString.Exclude
     private List<Order> orders;
 }

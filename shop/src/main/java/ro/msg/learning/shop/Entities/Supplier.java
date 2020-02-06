@@ -16,5 +16,6 @@ public class Supplier {
     private String name;
 
     @OneToMany(mappedBy = "supplier")
+    @ToString.Exclude
     private List<Product> products;
 }

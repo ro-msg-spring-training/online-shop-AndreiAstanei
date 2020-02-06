@@ -1,25 +1,42 @@
 package ro.msg.learning.shop.Controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ro.msg.learning.shop.DTOs.ProductDTO;
 import ro.msg.learning.shop.Services.ProductServiceImpl;
 
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
+@RequestMapping(value = "/products")
 public class ProductController {
 
-    @Autowired
-    private ProductServiceImpl productService;
 
-    @RequestMapping(value = "/products", method = RequestMethod.GET)
+    private final ProductServiceImpl productService;
+
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public List<ProductDTO> getProducts() {
         return productService.getProducts();
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public ProductDTO getProduct(@PathVariable("id") Integer id) {
+        return productService.getProduct(id);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String deleteProduct(@PathVariable("id") Integer id) {
+        return productService.deleteProductById(id);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ProductDTO updateProduct( @RequestBody ProductDTO updatedProductValues) {
+        return productService.updateProduct(updatedProductValues);
     }
 }

@@ -2,6 +2,7 @@ package ro.msg.learning.shop.Entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -29,5 +30,6 @@ public class Order {
     private String addressStreetAddress;
 
     @OneToMany(mappedBy = "order")
+    @ToString.Exclude
     private List<OrderDetail> orderDetails;
 }
