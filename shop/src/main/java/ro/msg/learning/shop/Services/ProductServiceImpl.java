@@ -116,3 +116,10 @@ public class ProductServiceImpl implements IProductService {
 }
 
 
+
+
+//        iPhone 10         Smartphones     Apple Inc
+//        iPhone 10         Smartphones     Cel.ro
+//        iPhone 10         Huse            Apple Inc
+
+
