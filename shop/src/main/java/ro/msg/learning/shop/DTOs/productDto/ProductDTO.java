@@ -1,4 +1,4 @@
-package ro.msg.learning.shop.DTOs;
+package ro.msg.learning.shop.DTOs.productDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,5 @@ public class ProductDTO {
     private Double weight;
     private String imageUrl;
     private String productCategoryName;
-    private String productCategoryDescription;
     private String productSupplierName;
 }

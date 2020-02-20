@@ -1,7 +1,7 @@
 package ro.msg.learning.shop.mappers;
 
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.DTOs.ProductDTO;
+import ro.msg.learning.shop.DTOs.productDto.ProductDTO;
 import ro.msg.learning.shop.Entities.Product;
 
 @Component
@@ -14,10 +14,19 @@ public class ProductMapper {
                 .imageUrl(product.getImageUrl())
                 .name(product.getName())
                 .price(product.getPrice())
-                .productCategoryDescription(product.getCategory().getDescription())
                 .productCategoryName(product.getCategory().getName())
                 .productSupplierName(product.getSupplier().getName())
                 .weight(product.getWeight())
                 .build();
+    }
+
+    public Product mapProductDTOToProduct(ProductDTO productDTO) {
+        return Product.builder()
+            .name(productDTO.getName())
+            .description(productDTO.getDescription())
+            .price(productDTO.getPrice())
+            .weight(productDTO.getWeight())
+            .imageUrl(productDTO.getImageUrl())
+            .build();
     }
 }

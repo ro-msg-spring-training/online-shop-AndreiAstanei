@@ -3,7 +3,7 @@ package ro.msg.learning.shop.Controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ro.msg.learning.shop.DTOs.ProductDTO;
+import ro.msg.learning.shop.DTOs.productDto.ProductDTO;
 import ro.msg.learning.shop.Services.ProductServiceImpl;
 
 import java.util.List;
@@ -12,8 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "/products")
 public class ProductController {
-
-
     private final ProductServiceImpl productService;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -36,7 +34,13 @@ public class ProductController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ProductDTO updateProduct( @RequestBody ProductDTO updatedProductValues) {
+    public ProductDTO updateProduct(@RequestBody ProductDTO updatedProductValues) {
         return productService.updateProduct(updatedProductValues);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseBody
+    public ProductDTO createProduct(@RequestBody ProductDTO newProductData) {
+        return productService.createProduct(newProductData);
     }
 }

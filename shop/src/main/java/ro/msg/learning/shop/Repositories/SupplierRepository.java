@@ -10,5 +10,5 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
 public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
-    Optional<Supplier> findByNameEquals(String supplierName);
+    Supplier findByNameEquals(String supplierName);
 }

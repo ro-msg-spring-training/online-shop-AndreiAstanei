@@ -1,6 +1,6 @@
 package ro.msg.learning.shop.Services;
 
-import ro.msg.learning.shop.DTOs.ProductDTO;
+import ro.msg.learning.shop.DTOs.productDto.ProductDTO;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ public interface IProductService {
 
     ProductDTO updateProduct(ProductDTO newProductValues);
 
-    Boolean createProduct(ProductDTO productData);
+    ProductDTO createProduct(ProductDTO productData);
 }

@@ -1,15 +1,14 @@
 package ro.msg.learning.shop.Services;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ro.msg.learning.shop.DTOs.ProductDTO;
+import ro.msg.learning.shop.DTOs.productDto.ProductDTO;
 import ro.msg.learning.shop.Entities.Product;
-import ro.msg.learning.shop.Entities.ProductCategory;
-import ro.msg.learning.shop.Entities.Supplier;
 import ro.msg.learning.shop.Repositories.ProductCategoryRepository;
 import ro.msg.learning.shop.Repositories.ProductRepository;
 import ro.msg.learning.shop.Repositories.SupplierRepository;
+import ro.msg.learning.shop.configuration.OrderStrategyConfiguration;
 import ro.msg.learning.shop.mappers.ProductMapper;
 
 import java.util.List;
@@ -21,10 +20,10 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
     private final ProductCategoryRepository productCategoryRepository;
     private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
+    private final OrderStrategyConfiguration orderStrategyConfiguration;
 
     @Override
     public List<ProductDTO> getProducts() {
@@ -37,7 +36,6 @@ public class ProductServiceImpl implements IProductService {
 
         Optional<Product> receivedProductFromDatabase = productRepository.findById(id);
         if (receivedProductFromDatabase.isPresent()) {
-//            productDTO = convertProductToDTO(receivedProductFromDatabase.get());
             productDTO = productMapper.mapProductToProductDTO(receivedProductFromDatabase.get());
         }
 
@@ -60,36 +58,35 @@ public class ProductServiceImpl implements IProductService {
 
         Optional<Product> receivedProductFromDatabase = productRepository.findById(newProductValues.getId());
 
-        // if we found the product
+        // if the product is present in the database, update the product's data
         if (receivedProductFromDatabase.isPresent()) {
-            // Verificari pentru categorie si supplier
-            Optional<ProductCategory> auxCategory = productCategoryRepository.findByNameEqualsAndDescriptionEquals(newProductValues.getProductCategoryName(), newProductValues.getProductCategoryDescription());
-            Optional<Supplier> auxSupplier = supplierRepository.findByNameEquals(newProductValues.getProductSupplierName());
+            Product auxProduct = receivedProductFromDatabase.get();
+            Product failSafeProduct = new Product(
+                    auxProduct.getId(),
+                    auxProduct.getName(),
+                    auxProduct.getDescription(),
+                    auxProduct.getPrice(),
+                    auxProduct.getWeight(),
+                    auxProduct.getImageUrl(),
+                    auxProduct.getCategory(),
+                    auxProduct.getSupplier(),
+                    auxProduct.getOrderDetails(),
+                    auxProduct.getStocks()
+            );
 
-            // If we found the category in the databse
-            if (auxCategory.isPresent()) {
-                 // If the category is different from the original one, we change it
-                if(!auxCategory.get().getId().equals(receivedProductFromDatabase.get().getCategory().getId())) {
-                    receivedProductFromDatabase.get().setCategory(auxCategory.get());
-                }
+            auxProduct.setName(newProductValues.getName());
+            auxProduct.setDescription(newProductValues.getDescription());
+            auxProduct.setPrice(newProductValues.getPrice());
+            auxProduct.setWeight(newProductValues.getWeight());
+            auxProduct.setImageUrl(newProductValues.getImageUrl());
+            auxProduct.setCategory(productCategoryRepository.findByNameEquals(newProductValues.getProductCategoryName()));
+            auxProduct.setSupplier(supplierRepository.findByNameEquals(newProductValues.getProductSupplierName()));
 
-                // If we found the supplier
-                if (auxSupplier.isPresent()) {
-                    // If the supplier is different from the original one, we change it
-                    if(!auxSupplier.get().getId().equals(receivedProductFromDatabase.get().getId())) {
-                        receivedProductFromDatabase.get().setSupplier(auxSupplier.get());
-                    }
-
-                    // Actualizam datele din product entity(momentan fara categorie si supplier)
-                    receivedProductFromDatabase.get().setName(newProductValues.getName());
-                    receivedProductFromDatabase.get().setDescription(newProductValues.getDescription());
-                    receivedProductFromDatabase.get().setPrice(newProductValues.getPrice());
-                    receivedProductFromDatabase.get().setWeight(newProductValues.getWeight());
-                    receivedProductFromDatabase.get().setImageUrl(newProductValues.getImageUrl());
-
-                    // Salvam modificarile in baza de date si le pregatim pentru returnare
-                    productDTO = productMapper.mapProductToProductDTO(productRepository.save(receivedProductFromDatabase.get()));
-                }
+            try {
+                // And save the new data to the database
+                productDTO = productMapper.mapProductToProductDTO(productRepository.save(auxProduct));
+            } catch(DataIntegrityViolationException exceptionType1) {
+                return productMapper.mapProductToProductDTO(failSafeProduct);
             }
         }
 
@@ -97,29 +94,28 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Boolean createProduct(ProductDTO productData) {
-        Boolean databaseResponse = true;
+    public ProductDTO createProduct(ProductDTO productData) {
+        ProductDTO newlyCreatedProduct;
 
-//        Optional<Product> databaseProduct = productRepository.find
+        // Get the required information for the new product from the DTO and from the database
+        Product toBeCreatedProduct = productMapper.mapProductDTOToProduct(productData);
+        toBeCreatedProduct.setCategory(productCategoryRepository.findByNameEquals(productData.getProductCategoryName()));
+        toBeCreatedProduct.setSupplier(supplierRepository.findByNameEquals(productData.getProductSupplierName()));
 
-        return databaseResponse;
+        try {
+            // add the new product to the database
+            newlyCreatedProduct = productMapper.mapProductToProductDTO(productRepository.save(toBeCreatedProduct));
+        } catch(DataIntegrityViolationException exceptionType1) {
+            return null;
+        }
+
+        return newlyCreatedProduct;
     }
 
 
     private ProductDTO convertProductToDTO(Product product) {
-        return modelMapper.map(product, ProductDTO.class);
-    }
-
-    private Product convertDTOToProduct(ProductDTO productDTO) {
-        return modelMapper.map(productDTO, Product.class);
+        return productMapper.mapProductToProductDTO(product);
     }
 }
-
-
-
-
-//        iPhone 10         Smartphones     Apple Inc
-//        iPhone 10         Smartphones     Cel.ro
-//        iPhone 10         Huse            Apple Inc
 
 

@@ -10,5 +10,5 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Integer> {
-    Optional<ProductCategory> findByNameEqualsAndDescriptionEquals(String categoryName, String categoryDescription);
+    ProductCategory findByNameEquals(String categoryName);
 }
