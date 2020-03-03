@@ -33,12 +33,15 @@ public class Location {
     private String addressStreetAddress;
 
     @OneToMany(mappedBy = "location")
+    @ToString.Exclude
     private List<Stock> stocks;
 
     @OneToMany(mappedBy = "location")
+    @ToString.Exclude
     private List<Revenue> revenues;
 
     @ManyToMany(mappedBy = "shippedFrom")
     @Fetch(value = FetchMode.SELECT)
+    @ToString.Exclude
     private Set<Order> orders;
 }
