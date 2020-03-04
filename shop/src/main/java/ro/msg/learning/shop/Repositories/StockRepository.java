@@ -20,6 +20,6 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
     Stock findByLocation_IdAndProduct_Id(Integer locationId, Integer productId);
 
     @Query(nativeQuery = true,
-           value = "select st.* from stock st where st.product_id = :productId and st.quantity >= :productQuantity group by st.quantity order by max(st.quantity) desc limit 1")
+            value = "select st.* from stock st where st.product_id = :productId and st.quantity >= :productQuantity group by st.quantity order by max(st.quantity) desc limit 1")
     Stock getStockForMaxProductQuantity(@Param("productId") Integer productId, @Param("productQuantity") Integer productQuantity);
 }

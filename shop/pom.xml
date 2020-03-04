@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<scope>test</scope> <!-- runtime -->
 		</dependency>
 
 		<dependency>
@@ -93,7 +93,16 @@
 			<artifactId>jackson-dataformat-csv</artifactId>
 			<version>2.10.1</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
