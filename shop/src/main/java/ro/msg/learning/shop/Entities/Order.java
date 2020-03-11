@@ -29,6 +29,7 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "location_id")
     )
     @Fetch(value = FetchMode.SELECT)
+    @ToString.Exclude
     private Set<Location> shippedFrom;
 
     @ManyToOne
@@ -53,5 +54,6 @@ public class Order {
     private String addressStreetAddress;
 
     @OneToMany(mappedBy = "order")
+    @ToString.Exclude
     private List<OrderDetail> orderDetails;
 }

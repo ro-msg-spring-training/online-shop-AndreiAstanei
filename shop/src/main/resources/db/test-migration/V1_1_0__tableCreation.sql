@@ -7,7 +7,6 @@ drop table if exists customer;
 drop table if exists product;
 drop table if exists product_category;
 drop table if exists supplier;
-drop table if exists hibernate_sequence;
 
 create table customer
 (
@@ -37,6 +36,7 @@ create table order_
     address_county         varchar(40),
     address_street_address varchar(160),
     created_at             datetime,
+    order_timestamp        integer,
     customer_id            integer,
     primary key (id)
 );
@@ -118,3 +118,8 @@ alter table stock
     add constraint FK_Location_To_Stock foreign key (location_id) references location (id);
 alter table stock
     add constraint FK_Product_To_Stock foreign key (product_id) references product (id);
+
+alter table supplier
+    add unique (name);
+alter table product_category
+    add unique (name);

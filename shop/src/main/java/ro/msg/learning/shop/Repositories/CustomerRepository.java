@@ -7,4 +7,5 @@ import ro.msg.learning.shop.Entities.Customer;
 
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
-public interface CustomerRepository extends JpaRepository<Customer, Integer> {  }
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+}

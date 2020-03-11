@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import ro.msg.learning.shop.DTOs.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.DTOs.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.DTOs.orderDto.ProcessedOrderProduct;
+import ro.msg.learning.shop.DTOs.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.Entities.*;
 import ro.msg.learning.shop.Repositories.*;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
-import ro.msg.learning.shop.DTOs.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.mappers.OrderMapper;
 
 import java.time.LocalDateTime;
@@ -21,9 +21,6 @@ import java.util.stream.Collectors;
 @Configuration
 @RequiredArgsConstructor
 public class OrderStrategyConfiguration {
-    @Value(value = "${order_selection_strategy}")
-    private OrderStrategies selectedStrategy;
-
     private final StockRepository stockRepository;
     private final CustomerRepository customerRepository;
     private final LocationRepository locationRepository;
@@ -31,8 +28,10 @@ public class OrderStrategyConfiguration {
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
+    @Value(value = "${order_selection_strategy}")
+    private OrderStrategies selectedStrategy;
 
-    public OrderDTOOutput generateOrderByStrategy(OrderDTOInput orderData) {
+    public OrderDTOOutput generateOrderByStrategy(OrderDTOInput orderData) throws OrderPlacingException {
         if (selectedStrategy == OrderStrategies.MOST_ABUNDANT) {
             return mostAbundantStrategy(orderData);
         }
@@ -40,7 +39,7 @@ public class OrderStrategyConfiguration {
         return singleLocationStrategy(orderData);
     }
 
-    private OrderDTOOutput singleLocationStrategy(OrderDTOInput inputData) {
+    private OrderDTOOutput singleLocationStrategy(OrderDTOInput inputData) throws OrderPlacingException {
         /* go through every location
          search for required quantity till we reach the end of desired products
          if we find at least 1 location that doesn't have enough products in stock, we go to the next location
@@ -86,6 +85,7 @@ public class OrderStrategyConfiguration {
             }
         } catch (OrderPlacingException ex) {
             System.out.println(ex.getMessage());
+            throw new OrderPlacingException("Nu s-a gasit o locatie corespunzatoare!");
         }
 
         return serverResponseToFrontend;
@@ -104,18 +104,18 @@ public class OrderStrategyConfiguration {
             orderedProducts.forEach(item -> {
                 Stock suitableStock = stockRepository.getStockForMaxProductQuantity(item.getProductId(), item.getProductQuantity());
 
-                if(suitableStock != null) {
+                if (suitableStock != null) {
                     locationIdsList.add(new ProcessedOrderProduct(suitableStock.getLocation().getId(), item.getProductId(), item.getProductQuantity()));
                 }
             });
 
             // Once we have all the products in our list, we go ahead and place the order and update the stocks
-            if(checkFoundLocationsValidityByProductPresence(locationIdsList, orderedProducts)) {
+            if (checkFoundLocationsValidityByProductPresence(locationIdsList, orderedProducts)) {
                 serverResponseToFrontEnd = orderMapper.mapOrderToOrderDTOOutput(placeOrder(locationIdsList, inputData));
             } else {
                 throw new OrderPlacingException("Nu s-a gasit o lista de locatii corespunzatoare!");
             }
-        }catch (OrderPlacingException ex) {
+        } catch (OrderPlacingException ex) {
             System.out.println(ex.getMessage());
         }
 
@@ -128,7 +128,7 @@ public class OrderStrategyConfiguration {
         List<Integer> orderedProductsIdList = orderedProducts.stream().map(SimpleProductQuantity::getProductId).collect(Collectors.toList());
         List<Integer> foundLocationsProductsIdList = locationIdsList.stream().map(ProcessedOrderProduct::getProductId).collect(Collectors.toList());
 
-        if(orderedProductsIdList.containsAll(foundLocationsProductsIdList)) {
+        if (orderedProductsIdList.containsAll(foundLocationsProductsIdList)) {
             result = true;
         }
 
@@ -138,18 +138,18 @@ public class OrderStrategyConfiguration {
     private Order placeOrder(List<ProcessedOrderProduct> readyToBeProccessedProducts, OrderDTOInput inputData) {
         Order responseOrder;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Integer offset  = ZonedDateTime.now().getOffset().getTotalSeconds()/60; // Local timezone offset for server(UTC)
+        Integer offset = ZonedDateTime.now().getOffset().getTotalSeconds() / 60; // Local timezone offset for server(UTC)
 
         // *** Adding the customer
         Customer orderCustomer = null;
-        if(customerRepository.findById(inputData.getCustomerId()).isPresent()) {
+        if (customerRepository.findById(inputData.getCustomerId()).isPresent()) {
             orderCustomer = customerRepository.findById(inputData.getCustomerId()).get();
         }
 
         // *** Setting the locations for the order
         Set<Location> orderLocation = new HashSet<>();
         readyToBeProccessedProducts.forEach(item -> {
-            if(locationRepository.findById(item.getLocationId()).isPresent()) {
+            if (locationRepository.findById(item.getLocationId()).isPresent()) {
                 orderLocation.add(locationRepository.findById(item.getLocationId()).get());
             }
         });
@@ -180,7 +180,7 @@ public class OrderStrategyConfiguration {
         Order finalResponseOrder = responseOrder;
         readyToBeProccessedProducts.forEach(item -> {
             Product tempProduct = new Product();
-            if(productRepository.findById(item.getProductId()).isPresent()) {
+            if (productRepository.findById(item.getProductId()).isPresent()) {
                 tempProduct = productRepository.findById(item.getProductId()).get();
             }
 
@@ -196,7 +196,6 @@ public class OrderStrategyConfiguration {
         // Updating the order with the newly created OrderDetails(more like history actually)
         List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrder_Id(finalResponseOrder.getId());
         finalResponseOrder.setOrderDetails(orderDetails);
-        orderRepository.save(finalResponseOrder);
 
         return orderRepository.save(finalResponseOrder);
     }

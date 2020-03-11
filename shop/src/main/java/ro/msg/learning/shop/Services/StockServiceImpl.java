@@ -1,7 +1,5 @@
 package ro.msg.learning.shop.Services;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ro.msg.learning.shop.DTOs.stockDto.StockDTOOutput;
@@ -19,6 +17,11 @@ public class StockServiceImpl implements IStockService {
 
     @Override
     public List<StockDTOOutput> getStocks(Integer locationId) {
-        return stockRepository.findStocksByLocation_Id(locationId).stream().map(stockMapper::mapStockToStockDTOOutput).collect(Collectors.toList());
+        List<StockDTOOutput> collect = stockRepository.findStocksByLocation_Id(locationId).stream().map((stock) -> {
+            StockDTOOutput stockDto = stockMapper.mapStockToStockDTOOutput(stock);
+            return stockDto;
+        }).collect(Collectors.toList());
+
+        return collect;
     }
 }

@@ -31,14 +31,16 @@ public class CsvExporter extends AbstractGenericHttpMessageConverter {
 
         if (o instanceof List)
             arrayList = new ArrayList<>((ArrayList<Object>) o);
-        else if (o instanceof LinkedHashMap){
-            System.out.println("There was a problem with the input data!");
+        else if (o instanceof LinkedHashMap) {
+            System.out.println("CSV Conversion Error_0001 - There was a problem with the input data!");
             return;
         } else {
             arrayList = Collections.singletonList(o);
         }
 
-        csvConverter.toCsv(arrayList.get(0).getClass(), arrayList, httpOutputMessage.getBody());
+        if (arrayList.size() > 0) {
+            csvConverter.toCsv(arrayList.get(0).getClass(), arrayList, httpOutputMessage.getBody());
+        }
     }
 
     @Override

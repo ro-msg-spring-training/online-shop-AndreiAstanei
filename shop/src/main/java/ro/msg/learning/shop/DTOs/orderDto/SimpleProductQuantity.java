@@ -15,6 +15,9 @@ public class SimpleProductQuantity {
 
     @Override
     public boolean equals(Object obj) {
-        return this.productId.equals(((SimpleProductQuantity) obj).productId) && this.productQuantity <= ((SimpleProductQuantity) obj).productQuantity;
+        if (obj instanceof SimpleProductQuantity)
+            return this.productId.equals(((SimpleProductQuantity) obj).productId) && this.productQuantity <= ((SimpleProductQuantity) obj).productQuantity;
+        else
+            return false;
     }
 }

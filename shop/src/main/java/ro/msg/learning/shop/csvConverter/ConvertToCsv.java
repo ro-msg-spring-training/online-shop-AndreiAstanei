@@ -6,7 +6,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import ro.msg.learning.shop.DTOs.stockDto.StockDTOOutput;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class ConvertToCsv<T> {
     public List<T> fromCsv(Class<T> csvClass, InputStream csvData) throws IOException {
         CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(csvClass);
+        CsvSchema schema = mapper.schemaFor(csvClass).withHeader();
 
         MappingIterator<T> it = mapper.readerFor(csvClass).with(schema)
                 .readValues(csvData);
@@ -30,7 +32,6 @@ public class ConvertToCsv<T> {
 
         Field[] fields = StockDTOOutput.class.getDeclaredFields();
         StringBuilder csvValue = new StringBuilder();
-
         List<String> fieldNames = Arrays.stream(fields).map(Field::getName).collect(Collectors.toList());
 
         csvValue.append(objectWriter.writeValueAsString(fieldNames));

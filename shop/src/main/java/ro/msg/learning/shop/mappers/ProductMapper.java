@@ -22,11 +22,11 @@ public class ProductMapper {
 
     public Product mapProductDTOToProduct(ProductDTO productDTO) {
         return Product.builder()
-            .name(productDTO.getName())
-            .description(productDTO.getDescription())
-            .price(productDTO.getPrice())
-            .weight(productDTO.getWeight())
-            .imageUrl(productDTO.getImageUrl())
-            .build();
+                .name(productDTO.getName())
+                .description(productDTO.getDescription())
+                .price(productDTO.getPrice())
+                .weight(productDTO.getWeight())
+                .imageUrl(productDTO.getImageUrl())
+                .build();
     }
 }

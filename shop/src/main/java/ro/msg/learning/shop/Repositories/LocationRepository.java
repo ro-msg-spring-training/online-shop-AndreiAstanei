@@ -7,4 +7,5 @@ import ro.msg.learning.shop.Entities.Location;
 
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
-public interface LocationRepository extends JpaRepository<Location, Integer> {    }
+public interface LocationRepository extends JpaRepository<Location, Integer> {
+}

@@ -85,7 +85,7 @@ public class ProductServiceImpl implements IProductService {
             try {
                 // And save the new data to the database
                 productDTO = productMapper.mapProductToProductDTO(productRepository.save(auxProduct));
-            } catch(DataIntegrityViolationException exceptionType1) {
+            } catch (DataIntegrityViolationException exceptionType1) {
                 return productMapper.mapProductToProductDTO(failSafeProduct);
             }
         }
@@ -105,7 +105,7 @@ public class ProductServiceImpl implements IProductService {
         try {
             // add the new product to the database
             newlyCreatedProduct = productMapper.mapProductToProductDTO(productRepository.save(toBeCreatedProduct));
-        } catch(DataIntegrityViolationException exceptionType1) {
+        } catch (DataIntegrityViolationException exceptionType1) {
             return null;
         }
 

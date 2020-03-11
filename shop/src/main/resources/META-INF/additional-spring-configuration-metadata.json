@@ -5,4 +5,5 @@
       "type": "ro.msg.learning.shop.configuration.OrderStrategies",
       "description": "Description for order_selection_strategy."
     }
-  ] }
+  ]
+}

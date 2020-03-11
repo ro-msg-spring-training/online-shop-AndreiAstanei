@@ -6,6 +6,7 @@ import ro.msg.learning.shop.DTOs.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.DTOs.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.Repositories.OrderRepository;
 import ro.msg.learning.shop.configuration.OrderStrategyConfiguration;
+import ro.msg.learning.shop.exceptions.OrderPlacingException;
 import ro.msg.learning.shop.mappers.OrderMapper;
 
 import java.util.ArrayList;
@@ -31,7 +32,16 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public OrderDTOOutput generateOrder(OrderDTOInput orderDTOInputData) {
-        return orderStrategyConfiguration.generateOrderByStrategy(orderDTOInputData);
+    public OrderDTOOutput generateOrder(OrderDTOInput orderDTOInputData) throws OrderPlacingException {
+        OrderDTOOutput orderDTOOutput = null;
+
+        try {
+            orderDTOOutput = orderStrategyConfiguration.generateOrderByStrategy(orderDTOInputData);
+        } catch (OrderPlacingException e) {
+            System.out.println(e.getMessage());
+            throw new OrderPlacingException("No stock");
+        }
+
+        return orderDTOOutput;
     }
 }

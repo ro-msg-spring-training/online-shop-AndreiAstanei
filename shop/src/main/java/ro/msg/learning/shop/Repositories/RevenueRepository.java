@@ -7,4 +7,5 @@ import ro.msg.learning.shop.Entities.Revenue;
 
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
-public interface RevenueRepository extends JpaRepository<Revenue, Integer> {    }
+public interface RevenueRepository extends JpaRepository<Revenue, Integer> {
+}
