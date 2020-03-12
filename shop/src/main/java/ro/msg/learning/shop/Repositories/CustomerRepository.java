@@ -10,5 +10,5 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @EnableJpaRepositories(basePackages = "ro.msg.learning.shop.Repositories")
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
-    Optional<Customer> findByUsernameEqualsAndPasswordEquals(String username, String password);
+    Optional<Customer> findByUsernameEquals(String username);
 }

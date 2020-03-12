@@ -4,6 +4,11 @@
       "name": "order_selection_strategy",
       "type": "ro.msg.learning.shop.configuration.OrderStrategies",
       "description": "Description for order_selection_strategy."
+    },
+    {
+      "name": "security_option",
+      "type": "ro.msg.learning.shop.Security.SecurityOptions",
+      "description": "Description for security_option."
     }
   ]
 }
