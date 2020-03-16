@@ -1,8 +1,23 @@
 package ro.msg.learning.shop.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+import ro.msg.learning.shop.DTOs.LocationOrderDTOs.LocationDirectionsMatrixAPI;
+import ro.msg.learning.shop.DTOs.LocationOrderDTOs.SimplifiedLocationIdAndAddress;
+import ro.msg.learning.shop.DTOs.LocationOrderDTOs.SimplifiedLocationIdAndDistance;
 import ro.msg.learning.shop.DTOs.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.DTOs.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.DTOs.orderDto.ProcessedOrderProduct;
@@ -10,8 +25,10 @@ import ro.msg.learning.shop.DTOs.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.Entities.*;
 import ro.msg.learning.shop.Repositories.*;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
+import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,15 +45,29 @@ public class OrderStrategyConfiguration {
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
+    private final LocationMapper locationMapper;
+    private final ObjectMapper objectMapper;
+
     @Value(value = "${order_selection_strategy}")
     private OrderStrategies selectedStrategy;
 
-    public OrderDTOOutput generateOrderByStrategy(OrderDTOInput orderData) throws OrderPlacingException {
-        if (selectedStrategy == OrderStrategies.MOST_ABUNDANT) {
-            return mostAbundantStrategy(orderData);
-        }
+    @Value(value = "${directions_route_matrix_api_key}")
+    private String routeMatrixApiKey;
 
-        return singleLocationStrategy(orderData);
+    public OrderDTOOutput generateOrderByStrategy(OrderDTOInput orderData) throws OrderPlacingException, JSONException, IOException {
+        switch(selectedStrategy) {
+            case MOST_ABUNDANT:
+                return mostAbundantStrategy(orderData);
+
+            case SINGLE_LOCATION:
+                return singleLocationStrategy(orderData);
+
+            case PROXIMITY_TO_LOCATION:
+                return proximityToLocationStrategy(orderData);
+
+            default:
+                return singleLocationStrategy(orderData);
+        }
     }
 
     private OrderDTOOutput singleLocationStrategy(OrderDTOInput inputData) throws OrderPlacingException {
@@ -120,6 +151,66 @@ public class OrderStrategyConfiguration {
         }
 
         return serverResponseToFrontEnd;
+    }
+
+    private OrderDTOOutput proximityToLocationStrategy(OrderDTOInput inputData) throws JSONException, IOException, OrderPlacingException {
+        // ------------------------- Implementation
+        OrderDTOOutput finalResult = null;
+
+        // All available locations with their corresponding addresses
+        List<SimplifiedLocationIdAndAddress> availableLocationsWorldwide = locationRepository.findAll().stream().map(currentLocation ->
+        {
+            Location currentWarehouseLocation = Location.builder().id(currentLocation.getId()).addressCountry(currentLocation.getAddressCountry()).addressCounty(currentLocation.getAddressCounty()).addressCity(currentLocation.getAddressCity()).addressStreetAddress(currentLocation.getAddressStreetAddress()).build();
+            return SimplifiedLocationIdAndAddress.builder().id(currentLocation.getId()).location(locationMapper.mapLocationToDirectionsMatrixLocation(currentWarehouseLocation)).build();
+        }).collect(Collectors.toList());
+
+        // Getting the Directions Matrix API response for the available locations
+        // Creating the request
+        RestTemplate restTemplate = new RestTemplate();
+        String baseUrl = "http://www.mapquestapi.com";
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject searchObject = new JSONObject();
+        JSONObject searchOptions = new JSONObject();
+        JSONArray locations = new JSONArray();
+
+        // Adding the locations to the request body, along side the delivery address(first one in the list)
+        locations.put(LocationDirectionsMatrixAPI.builder().street("Bulevardul Cetatii 93").city("Timisoara").country("RO").build());
+        availableLocationsWorldwide.forEach(location -> {
+            locations.put(new LocationDirectionsMatrixAPI(location.getLocation()));
+        });
+
+        searchObject.put("locations", locations);
+        searchOptions.put("manyToOne", true);
+        searchOptions.put("unit", "k");
+        searchObject.put("options", searchOptions);
+
+        // Sending the request and parsing the response
+        HttpEntity<String> request = new HttpEntity<>(searchObject.toString(), headers);
+
+        String response = restTemplate.postForObject(baseUrl + "/directions/v2/routematrix?key=" + routeMatrixApiKey, request, String.class);
+
+        JsonNode node = null;
+        if (response != null) {
+            node = objectMapper.readTree(response);
+
+            ObjectReader reader = objectMapper.readerFor(new TypeReference<List<String>>() {
+            });
+            List<Double> distanceDataFromAPICall = reader.readValue(node.get("distance"));
+
+            List<SimplifiedLocationIdAndDistance> locationsWithDistanceData = locationMapper.mapLocationsIdsAndDistanceData(
+                    locationRepository.findAll().stream().map(Location::getId).collect(Collectors.toList()),
+                    distanceDataFromAPICall.subList(1, distanceDataFromAPICall.size())
+            );
+
+            System.out.println(locationsWithDistanceData);
+
+
+            return finalResult;
+        } else {
+            throw new OrderPlacingException("Could not establish distance parameters between storing locations!");
+        }
     }
 
     private boolean checkFoundLocationsValidityByProductPresence(List<ProcessedOrderProduct> locationIdsList, List<SimpleProductQuantity> orderedProducts) {

@@ -1,5 +1,6 @@
 package ro.msg.learning.shop.UnitTests;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import ro.msg.learning.shop.Services.StockServiceImpl;
 import ro.msg.learning.shop.configuration.OrderStrategyConfiguration;
 import ro.msg.learning.shop.csvConverter.ConvertToCsv;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
+import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderDetailMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
 import ro.msg.learning.shop.mappers.StockMapper;
@@ -49,8 +51,10 @@ public class UnitTests {
     private ProductRepository productRepository = mock(ProductRepository.class);
     private OrderMapper orderMapper = mock(OrderMapper.class);
     private OrderDetailMapper orderDetailMapper = mock(OrderDetailMapper.class);
+    private LocationMapper locationMapper = mock(LocationMapper.class);
+    private ObjectMapper objectMapper = mock(ObjectMapper.class);
 
-    private OrderStrategyConfiguration orderStrategyConfiguration = new OrderStrategyConfiguration(stockRepository, customerRepository, locationRepository, orderRepository, orderDetailRepository, productRepository, orderMapper);
+    private OrderStrategyConfiguration orderStrategyConfiguration = new OrderStrategyConfiguration(stockRepository, customerRepository, locationRepository, orderRepository, orderDetailRepository, productRepository, orderMapper, locationMapper, objectMapper);
     private OrderServiceImpl orderService = new OrderServiceImpl(orderStrategyConfiguration, orderRepository, orderMapper);
 
     private OrderDTOInput orderDTOInput;

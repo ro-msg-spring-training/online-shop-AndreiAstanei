@@ -129,15 +129,15 @@ values (20,
 
 -- Inserting data into Location Table
 insert into Location (id, address_city, address_country, address_county, address_street_address, name)
-values (1, 'Bertoua', 'Cameroon', 'CM', '2 Talmadge Center', 'Dabvine');
+values (1, 'Timisoara', 'RO', 'Timis', 'Piata Consiliul Europei 2', 'Iulius Mall');
 insert into Location (id, address_city, address_country, address_county, address_street_address, name)
-values (2, 'Rio Covo', 'Portugal', 'PT', '48 Annamark Drive', 'Blogspan');
+values (2, 'Timisoara', 'RO', 'Timis', 'Strada Siemens 1', 'Continental');
 insert into Location (id, address_city, address_country, address_county, address_street_address, name)
-values (3, 'Reforma', 'Mexico', 'MX', '9 Saint Paul Drive', 'Skyble');
+values (3, 'Arad', 'RO', 'Arad', 'Calea Aurel Valicu 10-12', 'Atrium Mall');
 insert into Location (id, address_city, address_country, address_county, address_street_address, name)
-values (4, 'Whitchurch', 'United Kingdom', 'GB', '97 Continental Place', 'Yadel');
+values (4, 'Bucuresti', 'RO', 'Ilfov', 'Strada Izvor 2-4', 'Palatul Parlamentului');
 insert into Location (id, address_city, address_country, address_county, address_street_address, name)
-values (5, 'Buenavista', 'Mexico', 'MX', '52094 Fairview Way', 'Brainsphere');
+values (5, 'Cluj-Napoca', 'RO', 'CLuj', 'Strada Regele Ferdinand 20', 'Hotel Transilvania');
 
 -- Inserting data into Stock Table
 insert into Stock (id, quantity, location_id, product_id)
