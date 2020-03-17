@@ -1,6 +1,5 @@
 package ro.msg.learning.shop.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +54,7 @@ public class OrderStrategyConfiguration {
     private String routeMatrixApiKey;
 
     public OrderDTOOutput generateOrderByStrategy(OrderDTOInput orderData) throws OrderPlacingException, JSONException, IOException {
-        switch(selectedStrategy) {
+        switch (selectedStrategy) {
             case MOST_ABUNDANT:
                 return mostAbundantStrategy(orderData);
 
@@ -144,7 +143,7 @@ public class OrderStrategyConfiguration {
             if (checkFoundLocationsValidityByProductPresence(locationIdsList, orderedProducts)) {
                 serverResponseToFrontEnd = orderMapper.mapOrderToOrderDTOOutput(placeOrder(locationIdsList, inputData));
             } else {
-                throw new OrderPlacingException("Nu s-a gasit o lista de locatii corespunzatoare!");
+                throw new OrderPlacingException("Could not find a suitable list of locations for the given order!");
             }
         } catch (OrderPlacingException ex) {
             System.out.println(ex.getMessage());
@@ -177,9 +176,7 @@ public class OrderStrategyConfiguration {
 
         // Adding the locations to the request body, along side the delivery address(first one in the list)
         locations.put(LocationDirectionsMatrixAPI.builder().street("Bulevardul Cetatii 93").city("Timisoara").country("RO").build());
-        availableLocationsWorldwide.forEach(location -> {
-            locations.put(new LocationDirectionsMatrixAPI(location.getLocation()));
-        });
+        availableLocationsWorldwide.forEach(location -> locations.put(new LocationDirectionsMatrixAPI(location.getLocation())));
 
         searchObject.put("locations", locations);
         searchOptions.put("manyToOne", true);
@@ -197,20 +194,160 @@ public class OrderStrategyConfiguration {
 
             ObjectReader reader = objectMapper.readerFor(new TypeReference<List<String>>() {
             });
-            List<Double> distanceDataFromAPICall = reader.readValue(node.get("distance"));
+            List<String> apiCallStringResponse = reader.readValue(node.get("distance"));
+
+            List<Double> distanceDataFromAPICall = (apiCallStringResponse.subList(1, apiCallStringResponse.size())).stream().map(Double::parseDouble).collect(Collectors.toList());
 
             List<SimplifiedLocationIdAndDistance> locationsWithDistanceData = locationMapper.mapLocationsIdsAndDistanceData(
                     locationRepository.findAll().stream().map(Location::getId).collect(Collectors.toList()),
-                    distanceDataFromAPICall.subList(1, distanceDataFromAPICall.size())
+                    distanceDataFromAPICall
             );
 
-            System.out.println(locationsWithDistanceData);
+            // Sorting the list, so that the closest locations are at the beginning
+            locationsWithDistanceData = locationsWithDistanceData.stream().sorted(Comparator.comparing(SimplifiedLocationIdAndDistance::getDistance)).collect(Collectors.toList());
+
+            // Creating the order... we have 2 lists
+            List<SimpleProductQuantity> targetShoppingCart = inputData.getProductsList();
+            List<SimpleProductQuantity> currentShoppingCart = new ArrayList<>();
+            List<ProcessedOrderProduct> stocksToBeUpdated = new ArrayList<>();
+
+            // for earch location, see what products you can take
+            locationsWithDistanceData.forEach(location -> {
+                Optional<Location> receivedLocationFromDB = locationRepository.findById(location.getId());
+                if (receivedLocationFromDB.isPresent()) {
+                    Location currentLocation = receivedLocationFromDB.get();
+
+                    // for each stock
+                    currentLocation.getStocks().forEach(stock -> {
+                        // and for each product in target cart
+                        targetShoppingCart.forEach(targetProduct -> {
+                            // IF CC != TC
+                            if (!customListComparator(currentShoppingCart, targetShoppingCart)) {
+                                // check and update(if necessary)
+                                if (stock.getProduct().getId().equals(targetProduct.getProductId())) {
+                                    // Additional check, because on the first run CC will be empty, so there is no point in searching there
+                                    if (currentShoppingCart.size() == 0) {
+                                        // if the CC is empty, we do the same thing as if in the second case from further below
+
+                                        // we do not already have the product in the CC, so we add it(***)
+                                        int requiredQuantityFromStock = targetProduct.getProductQuantity();
+                                        int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
+
+                                        // Updating CC and STBU
+                                        currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
+                                        stocksToBeUpdated.add(ProcessedOrderProduct.builder()
+                                                .locationId(currentLocation.getId())
+                                                .productId(targetProduct.getProductId())
+                                                .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
+                                                .build()
+                                        );
+                                    } else {
+                                        // we have the product on stock, but we need to verify that we don't already have it in the CC
+                                        if (doesProductExistInCC(currentShoppingCart, targetShoppingCart, targetProduct.getProductId())) {
+                                            // we do already have the product in the CC, so we check for quantities(***)
+                                            Integer currentCartProductQuantity = currentShoppingCart.get(getProductIndexFromShoppingCartList(currentShoppingCart, targetProduct.getProductId())).getProductQuantity();
+
+                                            // if we don't have the required quantity
+                                            if (!currentCartProductQuantity.equals(targetProduct.getProductQuantity())) {
+                                                // find the quantity needed to fulfill order request for this product
+                                                int requiredQuantityFromStock = targetProduct.getProductQuantity() - currentCartProductQuantity;
+
+                                                // We want to see how much we have to take from the quantity on the stock
+                                                // subtract it from the stock, then update the CC and the STBU
+                                                // HAVE 1 -  NEED 3   ->             3 > 1         1  :  3
+                                                int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
+
+                                                // Updating CC and STBU
+                                                currentShoppingCart.get(getProductIndexFromShoppingCartList(currentShoppingCart, targetProduct.getProductId())).setProductQuantity(currentCartProductQuantity + quantityUpdateBasedOnExistingAndTargetValues);
+                                                stocksToBeUpdated.add(ProcessedOrderProduct.builder()
+                                                        .locationId(currentLocation.getId())
+                                                        .productId(targetProduct.getProductId())
+                                                        .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
+                                                        .build()
+                                                );
+                                            }
+                                        } else {
+                                            // we do not already have the product in the CC, so we add it(***)
+                                            int requiredQuantityFromStock = targetProduct.getProductQuantity();
+                                            int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
+
+                                            // Updating CC and STBU
+                                            currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
+                                            stocksToBeUpdated.add(ProcessedOrderProduct.builder()
+                                                    .locationId(currentLocation.getId())
+                                                    .productId(targetProduct.getProductId())
+                                                    .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
+                                                    .build()
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    System.out.println("Error 01 - proximityToLocationStrategy -> Could not find location in DB!");
+                }
+            });
+
+            if (customListComparator(currentShoppingCart, targetShoppingCart)) {
+                finalResult = orderMapper.mapOrderToOrderDTOOutput(placeOrder(stocksToBeUpdated, inputData));
+            } else {
+                throw new OrderPlacingException("Could not find a suitable list of locations for the given order!");
+            }
 
 
             return finalResult;
         } else {
             throw new OrderPlacingException("Could not establish distance parameters between storing locations!");
         }
+    }
+
+    // since the SimpleProductQuantity equals method is already being used in its current form(which is not suited for current use),
+    // we need to find another way to compare the lists
+    private Boolean customListComparator(List<SimpleProductQuantity> list1, List<SimpleProductQuantity> list2) {
+        // First we make sure that both lists have the same size
+        if (list1.size() == list2.size()) {
+            // Than we sort the lists by id's
+            list1 = list1.stream().sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
+            list2 = list2.stream().sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
+
+            SimpleProductQuantity p1, p2;
+            // Now we compare each item's id and quantity
+            for (int i = 0; i < list1.size(); i++) {
+                p1 = list1.get(i);
+                p2 = list2.get(i);
+
+                if (!p1.getProductId().equals(p2.getProductId()) || !p1.getProductQuantity().equals(p2.getProductQuantity())) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        return true;
+    }
+
+    // We have the TC here only because we must make sure the ID of the product is ok
+    private Boolean doesProductExistInCC(List<SimpleProductQuantity> cc, List<SimpleProductQuantity> tc, Integer productId) {
+        Integer ccIndex = getProductIndexFromShoppingCartList(cc, productId);
+        Integer tcIndex = getProductIndexFromShoppingCartList(tc, productId);
+
+        SimpleProductQuantity ccProduct = cc.get(ccIndex);
+        SimpleProductQuantity tcProduct = tc.get(tcIndex);
+
+        return ccProduct.getProductId().equals(tcProduct.getProductId());
+    }
+
+    private Integer getProductIndexFromShoppingCartList(List<SimpleProductQuantity> cart, Integer productId) {
+        for (int i = 0; i < cart.size(); i++) {
+            if (cart.get(i).getProductId().equals(productId)) {
+                return i;
+            }
+        }
+
+        return 0;
     }
 
     private boolean checkFoundLocationsValidityByProductPresence(List<ProcessedOrderProduct> locationIdsList, List<SimpleProductQuantity> orderedProducts) {

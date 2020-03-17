@@ -140,46 +140,29 @@ insert into Location (id, address_city, address_country, address_county, address
 values (5, 'Cluj-Napoca', 'RO', 'CLuj', 'Strada Regele Ferdinand 20', 'Hotel Transilvania');
 
 -- Inserting data into Stock Table
+/*
+ P 1 - Q 4
+ P 2 - Q 2
+
+
+ L 1 - P 1 - Q 1
+ L 1 - P 2 - Q 2
+ L 2 - P 1 - Q 1
+ L 3 - P 1 - Q 2
+ */
 insert into Stock (id, quantity, location_id, product_id)
-values (1, 2, 1, 1);
+values (1, 1, 1, 1);
 insert into Stock (id, quantity, location_id, product_id)
-values (2, 215, 2, 2);
+values (2, 2, 1, 2);
 insert into Stock (id, quantity, location_id, product_id)
-values (3, 118, 3, 3);
+values (3, 1, 2, 1);
 insert into Stock (id, quantity, location_id, product_id)
-values (4, 64, 4, 4);
+values (4, 3, 3, 1);
 insert into Stock (id, quantity, location_id, product_id)
-values (5, 133, 5, 5);
+values (5, 2, 4, 1);
 insert into Stock (id, quantity, location_id, product_id)
-values (6, 20, 4, 6);
-insert into Stock (id, quantity, location_id, product_id)
-values (7, 62, 3, 7);
-insert into Stock (id, quantity, location_id, product_id)
-values (8, 51, 2, 8);
-insert into Stock (id, quantity, location_id, product_id)
-values (9, 115, 1, 9);
-insert into Stock (id, quantity, location_id, product_id)
-values (10, 96, 2, 10);
-insert into Stock (id, quantity, location_id, product_id)
-values (11, 223, 3, 11);
-insert into Stock (id, quantity, location_id, product_id)
-values (12, 114, 4, 12);
-insert into Stock (id, quantity, location_id, product_id)
-values (13, 155, 5, 13);
-insert into Stock (id, quantity, location_id, product_id)
-values (14, 235, 4, 14);
-insert into Stock (id, quantity, location_id, product_id)
-values (15, 260, 3, 15);
-insert into Stock (id, quantity, location_id, product_id)
-values (16, 298, 2, 16);
-insert into Stock (id, quantity, location_id, product_id)
-values (17, 74, 2, 17);
-insert into Stock (id, quantity, location_id, product_id)
-values (18, 155, 1, 18);
-insert into Stock (id, quantity, location_id, product_id)
-values (19, 248, 2, 19);
-insert into Stock (id, quantity, location_id, product_id)
-values (20, 33, 3, 20);
+values (6, 2, 5, 1);
+
 
 -- Inserting data into Revenue Table
 insert into Revenue (id, date, sum, location_id)

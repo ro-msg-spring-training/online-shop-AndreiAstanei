@@ -23,9 +23,7 @@ public class LocationMapper {
 
         if(locationsIds.size() == distanceData.size()) {
             for(int i = 0; i < locationsIds.size(); i++) {
-                Integer locationId = locationsIds.get(i);
-                Double locationDistanceFromTarget = distanceData.get(i);
-//                resultList.add(new SimplifiedLocationIdAndDistance(locationId, locationDistanceFromTarget));
+                resultList.add(SimplifiedLocationIdAndDistance.builder().id(locationsIds.get(i)).distance(distanceData.get(i)).build());
             }
         }
 
