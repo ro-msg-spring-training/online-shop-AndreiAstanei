@@ -22,7 +22,7 @@ public class SecurityService implements UserDetailsService {
 
         requestedUser = customerRepository.findByUsernameEquals(username);
 
-        if(requestedUser.isPresent()) {
+        if (requestedUser.isPresent()) {
             return new CustomerSecurityDetails(requestedUser.get());
         } else {
             throw new UsernameNotFoundException("Wrong credentials");

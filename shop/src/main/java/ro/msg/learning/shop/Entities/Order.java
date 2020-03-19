@@ -1,8 +1,6 @@
 package ro.msg.learning.shop.Entities;
 
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,13 +20,13 @@ public class Order {
     @EqualsAndHashCode.Include
     private Integer id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "order_locations",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "location_id")
     )
-    @Fetch(value = FetchMode.SELECT)
+//    @Fetch(value = FetchMode.SELECT)
     @ToString.Exclude
     private Set<Location> shippedFrom;
 
@@ -53,7 +51,7 @@ public class Order {
     @EqualsAndHashCode.Include
     private String addressStreetAddress;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<OrderDetail> orderDetails;
 }

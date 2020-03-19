@@ -1,15 +1,18 @@
 package ro.msg.learning.shop.Entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Revenue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,5 +21,5 @@ public class Revenue {
     @ManyToOne
     private Location location;
     private LocalDate date;
-    private BigDecimal sum;
+    private Double sum;
 }

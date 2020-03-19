@@ -1,8 +1,6 @@
 package ro.msg.learning.shop.Entities;
 
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -39,8 +37,8 @@ public class Location {
     @ToString.Exclude
     private List<Revenue> revenues;
 
-    @ManyToMany(mappedBy = "shippedFrom")
-    @Fetch(value = FetchMode.SELECT)
+    @ManyToMany(mappedBy = "shippedFrom", fetch = FetchType.EAGER)
+//    @Fetch(value = FetchMode.SELECT)
     @ToString.Exclude
     private Set<Order> orders;
 }

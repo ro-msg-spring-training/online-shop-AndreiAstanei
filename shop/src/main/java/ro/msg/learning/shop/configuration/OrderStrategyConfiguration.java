@@ -233,14 +233,17 @@ public class OrderStrategyConfiguration {
                                         int requiredQuantityFromStock = targetProduct.getProductQuantity();
                                         int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
 
-                                        // Updating CC and STBU
-                                        currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
-                                        stocksToBeUpdated.add(ProcessedOrderProduct.builder()
-                                                .locationId(currentLocation.getId())
-                                                .productId(targetProduct.getProductId())
-                                                .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
-                                                .build()
-                                        );
+                                        // Additional check on the updatedQuantity before applying changes
+                                        if (quantityUpdateBasedOnExistingAndTargetValues > 0) {
+                                            // Updating CC and STBU
+                                            currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
+                                            stocksToBeUpdated.add(ProcessedOrderProduct.builder()
+                                                    .locationId(currentLocation.getId())
+                                                    .productId(targetProduct.getProductId())
+                                                    .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
+                                                    .build()
+                                            );
+                                        }
                                     } else {
                                         // we have the product on stock, but we need to verify that we don't already have it in the CC
                                         if (doesProductExistInCC(currentShoppingCart, targetShoppingCart, targetProduct.getProductId())) {
@@ -257,8 +260,27 @@ public class OrderStrategyConfiguration {
                                                 // HAVE 1 -  NEED 3   ->             3 > 1         1  :  3
                                                 int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
 
+                                                // Additional check on the updatedQuantity before applying changes
+                                                if (quantityUpdateBasedOnExistingAndTargetValues > 0) {
+                                                    // Updating CC and STBU
+                                                    currentShoppingCart.get(getProductIndexFromShoppingCartList(currentShoppingCart, targetProduct.getProductId())).setProductQuantity(currentCartProductQuantity + quantityUpdateBasedOnExistingAndTargetValues);
+                                                    stocksToBeUpdated.add(ProcessedOrderProduct.builder()
+                                                            .locationId(currentLocation.getId())
+                                                            .productId(targetProduct.getProductId())
+                                                            .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
+                                                            .build()
+                                                    );
+                                                }
+                                            }
+                                        } else {
+                                            // we do not already have the product in the CC, so we add it(***)
+                                            int requiredQuantityFromStock = targetProduct.getProductQuantity();
+                                            int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
+
+                                            // Additional check on the updatedQuantity before applying changes
+                                            if (quantityUpdateBasedOnExistingAndTargetValues > 0) {
                                                 // Updating CC and STBU
-                                                currentShoppingCart.get(getProductIndexFromShoppingCartList(currentShoppingCart, targetProduct.getProductId())).setProductQuantity(currentCartProductQuantity + quantityUpdateBasedOnExistingAndTargetValues);
+                                                currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
                                                 stocksToBeUpdated.add(ProcessedOrderProduct.builder()
                                                         .locationId(currentLocation.getId())
                                                         .productId(targetProduct.getProductId())
@@ -266,19 +288,6 @@ public class OrderStrategyConfiguration {
                                                         .build()
                                                 );
                                             }
-                                        } else {
-                                            // we do not already have the product in the CC, so we add it(***)
-                                            int requiredQuantityFromStock = targetProduct.getProductQuantity();
-                                            int quantityUpdateBasedOnExistingAndTargetValues = requiredQuantityFromStock > stock.getQuantity() ? stock.getQuantity() : requiredQuantityFromStock;
-
-                                            // Updating CC and STBU
-                                            currentShoppingCart.add(SimpleProductQuantity.builder().productId(targetProduct.getProductId()).productQuantity(quantityUpdateBasedOnExistingAndTargetValues).build());
-                                            stocksToBeUpdated.add(ProcessedOrderProduct.builder()
-                                                    .locationId(currentLocation.getId())
-                                                    .productId(targetProduct.getProductId())
-                                                    .productQuantity(quantityUpdateBasedOnExistingAndTargetValues)
-                                                    .build()
-                                            );
                                         }
                                     }
                                 }
