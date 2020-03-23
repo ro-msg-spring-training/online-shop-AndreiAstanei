@@ -1,9 +1,10 @@
 package ro.msg.learning.shop.mappers;
 
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.DTOs.LocationOrderDTOs.LocationDirectionsMatrixAPI;
-import ro.msg.learning.shop.DTOs.LocationOrderDTOs.SimplifiedLocationIdAndDistance;
-import ro.msg.learning.shop.Entities.Location;
+import ro.msg.learning.shop.dtos.LocationOrderDTOs.LocationDirectionsMatrixAPI;
+import ro.msg.learning.shop.dtos.LocationOrderDTOs.SimplifiedLocationIdAndDistance;
+import ro.msg.learning.shop.entities.EmbeddableAddress;
+import ro.msg.learning.shop.entities.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,11 @@ import java.util.List;
 @Component
 public class LocationMapper {
     public LocationDirectionsMatrixAPI mapLocationToDirectionsMatrixLocation(Location location) {
+        EmbeddableAddress embeddableAddress = location.getEmbeddableAddress();
         return LocationDirectionsMatrixAPI.builder()
-                .street(location.getAddressStreetAddress())
-                .city(location.getAddressCity())
-                .country(location.getAddressCountry())
+                .street(embeddableAddress.getStreetAddress())
+                .city(embeddableAddress.getCity())
+                .country(embeddableAddress.getCountry())
                 .build();
     }
 

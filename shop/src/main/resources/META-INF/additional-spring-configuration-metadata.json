@@ -7,7 +7,7 @@
     },
     {
       "name": "security_option",
-      "type": "ro.msg.learning.shop.Security.SecurityOptions",
+      "type": "ro.msg.learning.shop.security.SecurityOptions",
       "description": "Description for security_option."
     },
     {

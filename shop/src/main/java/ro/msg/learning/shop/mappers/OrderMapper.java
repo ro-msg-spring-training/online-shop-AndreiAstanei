@@ -2,8 +2,8 @@ package ro.msg.learning.shop.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.DTOs.orderDto.OrderDTOOutput;
-import ro.msg.learning.shop.Entities.Order;
+import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
+import ro.msg.learning.shop.entities.Order;
 
 import java.time.format.DateTimeFormatter;
 
@@ -19,10 +19,10 @@ public class OrderMapper {
                 .id(order.getId())
                 .customerId(order.getCustomer().getId())
                 .createdAt(order.getCreatedAt().plusMinutes(order.getOrder_timestamp()).format(outputDateFormatter))
-                .addressCountry(order.getAddressCountry())
-                .addressCounty(order.getAddressCounty())
-                .addressCity(order.getAddressCity())
-                .addressStreetAddress(order.getAddressStreetAddress())
+                .country(order.getEmbeddableAddress().getCountry())
+                .county(order.getEmbeddableAddress().getCounty())
+                .city(order.getEmbeddableAddress().getCity())
+                .streetAddress(order.getEmbeddableAddress().getStreetAddress())
                 .productsList(orderDetailMapper.mapOrderDetailToSimpleProductQuantityList(order.getOrderDetails()))
                 .build();
     }

@@ -1,8 +1,8 @@
 package ro.msg.learning.shop.mappers;
 
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.DTOs.productDto.ProductDTO;
-import ro.msg.learning.shop.Entities.Product;
+import ro.msg.learning.shop.dtos.productDto.ProductDTO;
+import ro.msg.learning.shop.entities.Product;
 
 @Component
 public class ProductMapper {

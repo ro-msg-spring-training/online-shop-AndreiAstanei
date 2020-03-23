@@ -5,7 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ro.msg.learning.shop.Entities.Customer;
+import ro.msg.learning.shop.entities.Customer;
 
 import java.util.Collection;
 

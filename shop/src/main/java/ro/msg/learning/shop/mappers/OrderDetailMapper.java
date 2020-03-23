@@ -1,8 +1,8 @@
 package ro.msg.learning.shop.mappers;
 
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.DTOs.orderDto.SimpleProductQuantity;
-import ro.msg.learning.shop.Entities.OrderDetail;
+import ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity;
+import ro.msg.learning.shop.entities.OrderDetail;
 
 import java.util.ArrayList;
 import java.util.List;

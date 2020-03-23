@@ -14,18 +14,18 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
-import ro.msg.learning.shop.DTOs.LocationOrderDTOs.LocationDirectionsMatrixAPI;
-import ro.msg.learning.shop.DTOs.LocationOrderDTOs.SimplifiedLocationIdAndAddress;
-import ro.msg.learning.shop.DTOs.LocationOrderDTOs.SimplifiedLocationIdAndDistance;
-import ro.msg.learning.shop.DTOs.orderDto.OrderDTOInput;
-import ro.msg.learning.shop.DTOs.orderDto.OrderDTOOutput;
-import ro.msg.learning.shop.DTOs.orderDto.ProcessedOrderProduct;
-import ro.msg.learning.shop.DTOs.orderDto.SimpleProductQuantity;
-import ro.msg.learning.shop.Entities.*;
-import ro.msg.learning.shop.Repositories.*;
+import ro.msg.learning.shop.dtos.LocationOrderDTOs.LocationDirectionsMatrixAPI;
+import ro.msg.learning.shop.dtos.LocationOrderDTOs.SimplifiedLocationIdAndAddress;
+import ro.msg.learning.shop.dtos.LocationOrderDTOs.SimplifiedLocationIdAndDistance;
+import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
+import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
+import ro.msg.learning.shop.dtos.orderDto.ProcessedOrderProduct;
+import ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity;
+import ro.msg.learning.shop.entities.*;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
 import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
+import ro.msg.learning.shop.repositories.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -85,37 +85,33 @@ public class OrderStrategyConfiguration {
         Order responseOrder = new Order();
         OrderDTOOutput serverResponseToFrontend = new OrderDTOOutput();
 
-        try {
-            // Getting stocks for a certain location
-            for (Integer locationId : locationIds) {
-                currentLocationIsSuitedForFulfillingOrder = true;
-                List<Stock> stocks = stockRepository.findStocksByLocation_Id(locationId);
-                currentProdutsOnStock = stocks.stream().map(stock -> new SimpleProductQuantity(stock.getProduct().getId(), stock.getQuantity())).sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
-                orderedProducts = inputData.getProductsList().stream().map(product -> new SimpleProductQuantity(product.getProductId(), product.getProductQuantity())).sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
+        // Getting stocks for a certain location
+        for (Integer locationId : locationIds) {
+            currentLocationIsSuitedForFulfillingOrder = true;
+            List<Stock> stocks = stockRepository.findStocksByLocation_Id(locationId);
+            currentProdutsOnStock = stocks.stream().map(stock -> new SimpleProductQuantity(stock.getProduct().getId(), stock.getQuantity())).sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
+            orderedProducts = inputData.getProductsList().stream().map(product -> new SimpleProductQuantity(product.getProductId(), product.getProductQuantity())).sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
 
-                // If the list of products is present in the current stock
-                if (currentProdutsOnStock.containsAll(orderedProducts)) {
-                    suitableLocationId = locationId;
-                    break;
-                } else {
-                    currentLocationIsSuitedForFulfillingOrder = false;
-                }
-            }
-
-            final Integer finalLocationId = suitableLocationId;
-            List<ProcessedOrderProduct> readyToBeProccessedProducts = inputData.getProductsList().stream().map(product -> new ProcessedOrderProduct(finalLocationId, product.getProductId(), product.getProductQuantity())).collect(Collectors.toList());
-
-            if (currentLocationIsSuitedForFulfillingOrder) {
-                // Creating the order
-                responseOrder = placeOrder(readyToBeProccessedProducts, inputData);
-
-                serverResponseToFrontend = orderMapper.mapOrderToOrderDTOOutput(responseOrder);
+            // If the list of products is present in the current stock
+            // -> *** Previously  currentProdutsOnStock.containsAll(orderedProducts)
+            if (doesCurrentStocksContainAllOrderedProducts(currentProdutsOnStock, orderedProducts)) {
+                suitableLocationId = locationId;
+                break;
             } else {
-                throw new OrderPlacingException("Nu s-a gasit o locatie corespunzatoare!");
+                currentLocationIsSuitedForFulfillingOrder = false;
             }
-        } catch (OrderPlacingException ex) {
-            System.out.println(ex.getMessage());
-            throw new OrderPlacingException("Nu s-a gasit o locatie corespunzatoare!");
+        }
+
+        final Integer finalLocationId = suitableLocationId;
+        List<ProcessedOrderProduct> readyToBeProccessedProducts = inputData.getProductsList().stream().map(product -> new ProcessedOrderProduct(finalLocationId, product.getProductId(), product.getProductQuantity())).collect(Collectors.toList());
+
+        if (currentLocationIsSuitedForFulfillingOrder) {
+            // Creating the order
+            responseOrder = placeOrder(readyToBeProccessedProducts, inputData);
+
+            serverResponseToFrontend = orderMapper.mapOrderToOrderDTOOutput(responseOrder);
+        } else {
+            throw new OrderPlacingException("Comanda nu a putut fi plasata! Nu s-a gasit o locatie corespunzatoare care sa detina toate produsele cerute!");
         }
 
         return serverResponseToFrontend;
@@ -158,10 +154,7 @@ public class OrderStrategyConfiguration {
 
         // All available locations with their corresponding addresses
         List<SimplifiedLocationIdAndAddress> availableLocationsWorldwide = locationRepository.findAll().stream().map(currentLocation ->
-        {
-            Location currentWarehouseLocation = Location.builder().id(currentLocation.getId()).addressCountry(currentLocation.getAddressCountry()).addressCounty(currentLocation.getAddressCounty()).addressCity(currentLocation.getAddressCity()).addressStreetAddress(currentLocation.getAddressStreetAddress()).build();
-            return SimplifiedLocationIdAndAddress.builder().id(currentLocation.getId()).location(locationMapper.mapLocationToDirectionsMatrixLocation(currentWarehouseLocation)).build();
-        }).collect(Collectors.toList());
+                SimplifiedLocationIdAndAddress.builder().id(currentLocation.getId()).location(locationMapper.mapLocationToDirectionsMatrixLocation(currentLocation)).build()).collect(Collectors.toList());
 
         // Getting the Directions Matrix API response for the available locations
         // Creating the request
@@ -221,8 +214,8 @@ public class OrderStrategyConfiguration {
                     currentLocation.getStocks().forEach(stock -> {
                         // and for each product in target cart
                         targetShoppingCart.forEach(targetProduct -> {
-                            // IF CC != TC
-                            if (!customListComparator(currentShoppingCart, targetShoppingCart)) {
+                            // IF CC != TC              -> *** Previously !customListComparator(currentShoppingCart, targetShoppingCart)
+                            if (!currentShoppingCart.containsAll(targetShoppingCart)) {
                                 // check and update(if necessary)
                                 if (stock.getProduct().getId().equals(targetProduct.getProductId())) {
                                     // Additional check, because on the first run CC will be empty, so there is no point in searching there
@@ -299,7 +292,7 @@ public class OrderStrategyConfiguration {
                 }
             });
 
-            if (customListComparator(currentShoppingCart, targetShoppingCart)) {
+            if (currentShoppingCart.containsAll(targetShoppingCart)) {
                 finalResult = orderMapper.mapOrderToOrderDTOOutput(placeOrder(stocksToBeUpdated, inputData));
             } else {
                 throw new OrderPlacingException("Could not find a suitable list of locations for the given order!");
@@ -312,22 +305,19 @@ public class OrderStrategyConfiguration {
         }
     }
 
-    // since the SimpleProductQuantity equals method is already being used in its current form(which is not suited for current use),
-    // we need to find another way to compare the lists
-    private Boolean customListComparator(List<SimpleProductQuantity> list1, List<SimpleProductQuantity> list2) {
+    private Boolean doesCurrentStocksContainAllOrderedProducts(List<SimpleProductQuantity> list1, List<SimpleProductQuantity> list2) {
+        Collections.sort(list1);
+        Collections.sort(list2);
+
         // First we make sure that both lists have the same size
         if (list1.size() == list2.size()) {
-            // Than we sort the lists by id's
-            list1 = list1.stream().sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
-            list2 = list2.stream().sorted(Comparator.comparing(SimpleProductQuantity::getProductId)).collect(Collectors.toList());
-
-            SimpleProductQuantity p1, p2;
-            // Now we compare each item's id and quantity
+            // Than we compare the id in the first place, and after that the product quantities
             for (int i = 0; i < list1.size(); i++) {
-                p1 = list1.get(i);
-                p2 = list2.get(i);
+                if (!list1.get(i).getProductId().equals(list2.get(i).getProductId())) {
+                    return false;
+                }
 
-                if (!p1.getProductId().equals(p2.getProductId()) || !p1.getProductQuantity().equals(p2.getProductQuantity())) {
+                if (list1.get(i).getProductQuantity() < list2.get(i).getProductQuantity()) {
                     return false;
                 }
             }
@@ -392,15 +382,19 @@ public class OrderStrategyConfiguration {
         });
 
         // *** Creating the order
+        EmbeddableAddress orderAddress = EmbeddableAddress.builder()
+                .country(inputData.getAddressCountry())
+                .county(inputData.getAddressCounty())
+                .city(inputData.getAddressCity())
+                .streetAddress(inputData.getAddressStreetAddress())
+                .build();
+
         Order finalUserOrder = Order.builder()
                 .createdAt(LocalDateTime.parse(inputData.getCreatedAt(), formatter))
                 .order_timestamp(offset + inputData.getOrder_timestamp())   //calculating the offset for the client based on the client's timezone and the server's timezone
                 .customer(orderCustomer)
                 .shippedFrom(orderLocation)
-                .addressCity(inputData.getAddressCity())
-                .addressCountry(inputData.getAddressCountry())
-                .addressCounty(inputData.getAddressCounty())
-                .addressStreetAddress(inputData.getAddressStreetAddress())
+                .embeddableAddress(orderAddress)
                 .build();
 
         // Saving the new Order in the database
