@@ -1,6 +1,7 @@
 package ro.msg.learning.shop.services;
 
 import ro.msg.learning.shop.dtos.productDto.ProductDTO;
+import ro.msg.learning.shop.exceptions.ProductNotCreatedException;
 import ro.msg.learning.shop.exceptions.ProductNotFoundException;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface IProductService {
 
     String deleteProductById(Integer id);
 
-    ProductDTO updateProduct(ProductDTO newProductValues);
+    ProductDTO updateProduct(ProductDTO newProductValues) throws ProductNotFoundException;
 
-    ProductDTO createProduct(ProductDTO productData);
+    ProductDTO createProduct(ProductDTO productData) throws ProductNotCreatedException;
 }

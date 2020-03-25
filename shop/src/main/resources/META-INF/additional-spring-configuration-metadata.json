@@ -2,7 +2,7 @@
   "properties": [
     {
       "name": "order_selection_strategy",
-      "type": "ro.msg.learning.shop.configuration.OrderStrategies",
+      "type": "ro.msg.learning.shop.orderStrategies.OrderStrategiesEnum",
       "description": "Description for order_selection_strategy."
     },
     {

@@ -1,11 +1,10 @@
 package ro.msg.learning.shop.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ro.msg.learning.shop.dtos.productDto.ProductDTO;
+import ro.msg.learning.shop.exceptions.ProductNotCreatedException;
 import ro.msg.learning.shop.exceptions.ProductNotFoundException;
 import ro.msg.learning.shop.services.ProductServiceImpl;
 
@@ -24,13 +23,8 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ProductDTO getProduct(@PathVariable("id") Integer id) {
-        try {
-            return productService.getProduct(id);
-        } catch (ProductNotFoundException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
+    public ProductDTO getProduct(@PathVariable("id") Integer id) throws ProductNotFoundException {
+        return productService.getProduct(id);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,12 +33,12 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ProductDTO updateProduct(@Valid @RequestBody ProductDTO updatedProductValues) {
+    public ProductDTO updateProduct(@Valid @RequestBody ProductDTO updatedProductValues) throws ProductNotFoundException {
         return productService.updateProduct(updatedProductValues);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ProductDTO createProduct(@RequestBody ProductDTO newProductData) {
+    public ProductDTO createProduct(@RequestBody ProductDTO newProductData) throws ProductNotCreatedException {
         return productService.createProduct(newProductData);
     }
 }

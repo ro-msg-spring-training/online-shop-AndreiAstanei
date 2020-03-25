@@ -1,29 +1,21 @@
 package ro.msg.learning.shop.integrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import ro.msg.learning.shop.configuration.OrderStrategyConfiguration;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.entities.Order;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
-import ro.msg.learning.shop.mappers.LocationMapper;
-import ro.msg.learning.shop.mappers.OrderDetailMapper;
-import ro.msg.learning.shop.mappers.OrderMapper;
-import ro.msg.learning.shop.repositories.*;
+import ro.msg.learning.shop.orderStrategies.OrderPlacingStrategiesInterface;
+import ro.msg.learning.shop.repositories.OrderRepository;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,34 +24,11 @@ import java.util.Optional;
 @SpringBootTest
 public class IntegrationTests {
     @Autowired
-    private StockRepository stockRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private LocationRepository locationRepository;
-    @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private OrderMapper orderMapper;
-    @Autowired
-    private OrderDetailMapper orderDetailMapper;
-    @Autowired
-    private LocationMapper locationMapper;
-    @Autowired
-    private ObjectMapper objectMapper;
 
-    private OrderStrategyConfiguration orderStrategyConfiguration;
-
-    @Before
-    public void initialize() {
-        orderDetailMapper = new OrderDetailMapper();
-        orderMapper = new OrderMapper(orderDetailMapper);
-        orderStrategyConfiguration = new OrderStrategyConfiguration(stockRepository, customerRepository, locationRepository, orderRepository, orderDetailRepository, productRepository, orderMapper, locationMapper, objectMapper);
-    }
+    // Strategy injections
+    @Autowired
+    private OrderPlacingStrategiesInterface orderPlacingStrategiesInterface;
 
     @Test
     @Transactional
@@ -80,7 +49,7 @@ public class IntegrationTests {
 
         OrderDTOOutput orderGenerationResult = null;
         try {
-            orderGenerationResult = orderStrategyConfiguration.generateOrderByStrategy(orderDTOInput);
+            orderGenerationResult = orderPlacingStrategiesInterface.generateOrder(orderDTOInput);
 
             Optional<Order> createdOrderInDB = orderRepository.findById(orderGenerationResult.getId());
 
@@ -95,12 +64,6 @@ public class IntegrationTests {
                 Assert.assertEquals(createdOrder.getOrderDetails().get(0).getQuantity(), Optional.of(1).get());
             }
         } catch (OrderPlacingException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -123,7 +86,7 @@ public class IntegrationTests {
                 .build();
 
         Assertions.assertThrows(OrderPlacingException.class, () -> {
-            OrderDTOOutput orderGenerationResult = orderStrategyConfiguration.generateOrderByStrategy(orderDTOInput);
+            OrderDTOOutput orderGenerationResult = orderPlacingStrategiesInterface.generateOrder(orderDTOInput);
         });
     }
 }

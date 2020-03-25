@@ -1,12 +1,10 @@
 package ro.msg.learning.shop.unitTests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import ro.msg.learning.shop.configuration.OrderStrategyConfiguration;
 import ro.msg.learning.shop.csvConverter.ConvertToCsv;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
@@ -14,11 +12,13 @@ import ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.dtos.stockDto.StockDTOOutput;
 import ro.msg.learning.shop.entities.*;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
-import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderDetailMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
 import ro.msg.learning.shop.mappers.StockMapper;
-import ro.msg.learning.shop.repositories.*;
+import ro.msg.learning.shop.orderStrategies.OrderPlacingStrategiesInterface;
+import ro.msg.learning.shop.repositories.OrderDetailRepository;
+import ro.msg.learning.shop.repositories.OrderRepository;
+import ro.msg.learning.shop.repositories.StockRepository;
 import ro.msg.learning.shop.services.OrderServiceImpl;
 import ro.msg.learning.shop.services.StockServiceImpl;
 
@@ -44,21 +44,16 @@ public class UnitTests {
     private ConvertToCsv<StockDTOOutput> convertToCsv;
 
     // ORDER TEST
-    private CustomerRepository customerRepository = mock(CustomerRepository.class);
-    private LocationRepository locationRepository = mock(LocationRepository.class);
     private OrderRepository orderRepository = mock(OrderRepository.class);
     private OrderDetailRepository orderDetailRepository = mock(OrderDetailRepository.class);
-    private ProductRepository productRepository = mock(ProductRepository.class);
     private OrderMapper orderMapper = mock(OrderMapper.class);
     private OrderDetailMapper orderDetailMapper = mock(OrderDetailMapper.class);
-    private LocationMapper locationMapper = mock(LocationMapper.class);
-    private ObjectMapper objectMapper = mock(ObjectMapper.class);
 
-    private OrderStrategyConfiguration orderStrategyConfiguration = new OrderStrategyConfiguration(stockRepository, customerRepository, locationRepository, orderRepository, orderDetailRepository, productRepository, orderMapper, locationMapper, objectMapper);
-    private OrderServiceImpl orderService = new OrderServiceImpl(orderStrategyConfiguration, orderRepository, orderMapper);
+    private OrderPlacingStrategiesInterface orderPlacingStrategiesInterface = mock(OrderPlacingStrategiesInterface.class);
+
+    private OrderServiceImpl orderService = new OrderServiceImpl(orderRepository, orderMapper, orderPlacingStrategiesInterface);
 
     private OrderDTOInput orderDTOInput;
-    private List<OrderDTOOutput> resultOrdersList;
     private List<SimpleProductQuantity> simpleProductQuantities;
     private List<Integer> locationsList;
 
@@ -123,7 +118,7 @@ public class UnitTests {
 
     // Pass
     @Test
-    public void placeOrderSingleLocationTest() {
+    public void placeOrderSingleLocationTest() throws OrderPlacingException {
         // Stocks -> location 1 prod 1 quant 10, prod 2 quant 10
         //        -> Location 2 prod 1 quant 5, prod 2 quant 15
         mockStockList.add(Stock.builder().id(1).quantity(10).product(Product.builder().id(1).build()).location(Location.builder().id(1).build()).build());
@@ -148,6 +143,11 @@ public class UnitTests {
         when(orderRepository.save(any(Order.class))).thenReturn(Order.builder().id(1).build());
         List<OrderDetail> orderDetailsList = new ArrayList<>();
         when(orderDetailRepository.findAllByOrder_Id(anyInt())).thenReturn(orderDetailsList);
+
+        when(orderPlacingStrategiesInterface.generateOrder(any(OrderDTOInput.class))).thenReturn(
+                OrderDTOOutput.builder()
+                        .productsList(simpleProductQuantities)
+                        .build());
 
         orderDTOInput = OrderDTOInput.builder()
                 .productsList(simpleProductQuantities).order_timestamp(0).customerId(1).createdAt("2020-03-06 10:10:10")

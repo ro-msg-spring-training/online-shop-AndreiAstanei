@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dtos.productDto.ProductDTO;
 import ro.msg.learning.shop.entities.Product;
+import ro.msg.learning.shop.exceptions.ProductNotCreatedException;
 import ro.msg.learning.shop.exceptions.ProductNotFoundException;
 import ro.msg.learning.shop.mappers.ProductMapper;
 import ro.msg.learning.shop.repositories.ProductCategoryRepository;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
-
     private final ProductRepository productRepository;
     private final ProductCategoryRepository productCategoryRepository;
     private final SupplierRepository supplierRepository;
@@ -51,9 +51,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductDTO updateProduct(ProductDTO newProductValues) {
-        ProductDTO productDTO = new ProductDTO();
-
+    public ProductDTO updateProduct(ProductDTO newProductValues) throws ProductNotFoundException {
         Optional<Product> receivedProductFromDatabase = productRepository.findById(newProductValues.getId());
 
         // if the product is present in the database, update the product's data
@@ -69,14 +67,14 @@ public class ProductServiceImpl implements IProductService {
             auxProduct.setSupplier(supplierRepository.findByNameEquals(newProductValues.getProductSupplierName()));
 
             // And save the new data to the database
-            productDTO = productMapper.mapProductToProductDTO(productRepository.save(auxProduct));
+            return productMapper.mapProductToProductDTO(productRepository.save(auxProduct));
+        } else {
+            throw new ProductNotFoundException("Couldn't find the product with the specified id!");
         }
-
-        return productDTO;
     }
 
     @Override
-    public ProductDTO createProduct(ProductDTO productData) {
+    public ProductDTO createProduct(ProductDTO productData) throws ProductNotCreatedException {
         ProductDTO newlyCreatedProduct;
 
         // Get the required information for the new product from the DTO and from the database
@@ -86,8 +84,11 @@ public class ProductServiceImpl implements IProductService {
 
         // add the new product to the database
         newlyCreatedProduct = productMapper.mapProductToProductDTO(productRepository.save(toBeCreatedProduct));
-
-        return newlyCreatedProduct;
+        if (newlyCreatedProduct != null) {
+            return newlyCreatedProduct;
+        } else {
+            throw new ProductNotCreatedException("Something went wrong while creating the new product! Please check the data and try again.");
+        }
     }
 }
 

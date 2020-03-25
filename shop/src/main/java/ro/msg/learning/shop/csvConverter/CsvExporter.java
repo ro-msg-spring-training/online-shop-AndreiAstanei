@@ -1,5 +1,6 @@
 package ro.msg.learning.shop.csvConverter;
 
+import lombok.SneakyThrows;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Component
 public class CsvExporter extends AbstractGenericHttpMessageConverter {
+    private static final MediaType SUPPORTED_MEDIA_TYPE = new MediaType("text", "csv");
     private final ConvertToCsv csvConverter;
 
     public CsvExporter() {
@@ -51,5 +54,34 @@ public class CsvExporter extends AbstractGenericHttpMessageConverter {
     @Override
     public Object read(Type type, Class aClass, HttpInputMessage httpInputMessage) throws HttpMessageNotReadableException, IOException {
         return readInternal(aClass, httpInputMessage);
+    }
+
+    @SneakyThrows
+    @Override
+    public boolean canRead(Type type, Class contextClass, MediaType mediaType) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+
+            return canRead(mediaType) &&
+                    mediaType != null &&
+                    mediaType.equals(SUPPORTED_MEDIA_TYPE) &&
+                    Class.forName(parameterizedType.getRawType().getTypeName()).isAssignableFrom(List.class);
+        }
+
+        return false;
+    }
+
+    @SneakyThrows
+    @Override
+    public boolean canWrite(Type type, Class clazz, MediaType mediaType) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            return canWrite(mediaType) &&
+                    mediaType != null &&
+                    mediaType.equals(SUPPORTED_MEDIA_TYPE) &&
+                    Class.forName(parameterizedType.getRawType().getTypeName()).isAssignableFrom(List.class);
+        }
+
+        return false;
     }
 }

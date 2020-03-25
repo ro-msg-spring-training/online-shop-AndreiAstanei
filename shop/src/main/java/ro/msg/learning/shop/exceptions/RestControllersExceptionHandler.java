@@ -33,6 +33,14 @@ public class RestControllersExceptionHandler extends ResponseEntityExceptionHand
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(ProductNotCreatedException.class)
+    protected ResponseEntity<Object> handleProductNotCreatedException(ProductNotCreatedException ex) {
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
+        apiError.setMessage(ex.getMessage());
+
+        return buildResponseEntity(apiError);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

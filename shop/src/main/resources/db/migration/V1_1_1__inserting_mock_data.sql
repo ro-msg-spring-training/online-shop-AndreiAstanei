@@ -141,7 +141,7 @@ values (5, 'Cluj-Napoca', 'RO', 'CLuj', 'Strada Regele Ferdinand 20', 'Hotel Tra
 
 -- Inserting data into Stock Table
 insert into Stock (id, quantity, location_id, product_id)
-values (1, 2, 1, 1);
+values (1, 120, 1, 1);
 insert into Stock (id, quantity, location_id, product_id)
 values (2, 215, 2, 2);
 insert into Stock (id, quantity, location_id, product_id)
