@@ -8,9 +8,10 @@ import ro.msg.learning.shop.entities.Product;
 import ro.msg.learning.shop.exceptions.ProductNotCreatedException;
 import ro.msg.learning.shop.exceptions.ProductNotFoundException;
 import ro.msg.learning.shop.mappers.ProductMapper;
-import ro.msg.learning.shop.repositories.ProductCategoryRepository;
-import ro.msg.learning.shop.repositories.ProductRepository;
-import ro.msg.learning.shop.repositories.SupplierRepository;
+import ro.msg.learning.shop.repositories.jdbcBasedRepositories.JDBCBasedProductRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.ProductCategoryRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.ProductRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.SupplierRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,15 +25,16 @@ public class ProductServiceImpl implements IProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
+    private final JDBCBasedProductRepository jdbcBasedProductRepository;
 
     @Override
     public List<ProductDTO> getProducts() {
-        return productRepository.findAll().stream().map(productMapper::mapProductToProductDTO).collect(Collectors.toList());
+        return jdbcBasedProductRepository.findAll().stream().map(productMapper::mapProductToProductDTO).collect(Collectors.toList());
     }
 
     @Override
     public ProductDTO getProduct(Integer id) throws ProductNotFoundException {
-        Optional<Product> receivedProductFromDatabase = productRepository.findById(id);
+        Optional<Product> receivedProductFromDatabase = jdbcBasedProductRepository.findById(id);
         if (receivedProductFromDatabase.isPresent()) {
             return productMapper.mapProductToProductDTO(receivedProductFromDatabase.get());
         } else {
@@ -42,8 +44,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public String deleteProductById(Integer id) {
-        if (productRepository.findById(id).isPresent()) {
-            productRepository.deleteById(id);
+        if (jdbcBasedProductRepository.findById(id).isPresent()) {
+            jdbcBasedProductRepository.deleteById(id);
             return "Product deleted!";
         } else {
             return "Product not found!";
@@ -52,7 +54,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductDTO updateProduct(ProductDTO newProductValues) throws ProductNotFoundException {
-        Optional<Product> receivedProductFromDatabase = productRepository.findById(newProductValues.getId());
+        Optional<Product> receivedProductFromDatabase = jdbcBasedProductRepository.findById(newProductValues.getId());
 
         // if the product is present in the database, update the product's data
         if (receivedProductFromDatabase.isPresent()) {
@@ -67,7 +69,7 @@ public class ProductServiceImpl implements IProductService {
             auxProduct.setSupplier(supplierRepository.findByNameEquals(newProductValues.getProductSupplierName()));
 
             // And save the new data to the database
-            return productMapper.mapProductToProductDTO(productRepository.save(auxProduct));
+            return productMapper.mapProductToProductDTO(jdbcBasedProductRepository.save(auxProduct).get());
         } else {
             throw new ProductNotFoundException("Couldn't find the product with the specified id!");
         }
@@ -83,7 +85,7 @@ public class ProductServiceImpl implements IProductService {
         toBeCreatedProduct.setSupplier(supplierRepository.findByNameEquals(productData.getProductSupplierName()));
 
         // add the new product to the database
-        newlyCreatedProduct = productMapper.mapProductToProductDTO(productRepository.save(toBeCreatedProduct));
+        newlyCreatedProduct = productMapper.mapProductToProductDTO(jdbcBasedProductRepository.save(toBeCreatedProduct).get());
         if (newlyCreatedProduct != null) {
             return newlyCreatedProduct;
         } else {

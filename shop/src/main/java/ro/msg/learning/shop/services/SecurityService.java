@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ro.msg.learning.shop.entities.Customer;
 import ro.msg.learning.shop.mappers.CustomerSecurityDetails;
-import ro.msg.learning.shop.repositories.CustomerRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.CustomerRepository;
 
 import java.util.Optional;
 

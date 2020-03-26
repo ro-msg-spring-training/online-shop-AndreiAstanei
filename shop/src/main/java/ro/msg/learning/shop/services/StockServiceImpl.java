@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dtos.stockDto.StockDTOOutput;
 import ro.msg.learning.shop.mappers.StockMapper;
-import ro.msg.learning.shop.repositories.StockRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.StockRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

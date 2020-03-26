@@ -10,7 +10,7 @@ import ro.msg.learning.shop.dtos.orderDto.ProcessedOrderProduct;
 import ro.msg.learning.shop.entities.*;
 import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
-import ro.msg.learning.shop.repositories.*;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.*;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;

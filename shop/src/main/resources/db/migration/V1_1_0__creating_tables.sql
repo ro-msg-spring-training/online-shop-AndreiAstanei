@@ -117,4 +117,4 @@ alter table revenue
 alter table stock
     add constraint FK_Location_To_Stock foreign key (location_id) references location (id);
 alter table stock
-    add constraint FK_Product_To_Stock foreign key (product_id) references product (id);
+    add constraint FK_Product_To_Stock foreign key (product_id) references product (id) ON DELETE CASCADE;

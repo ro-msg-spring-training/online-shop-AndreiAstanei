@@ -16,9 +16,9 @@ import ro.msg.learning.shop.mappers.OrderDetailMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
 import ro.msg.learning.shop.mappers.StockMapper;
 import ro.msg.learning.shop.orderStrategies.OrderPlacingStrategiesInterface;
-import ro.msg.learning.shop.repositories.OrderDetailRepository;
-import ro.msg.learning.shop.repositories.OrderRepository;
-import ro.msg.learning.shop.repositories.StockRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderDetailRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.StockRepository;
 import ro.msg.learning.shop.services.OrderServiceImpl;
 import ro.msg.learning.shop.services.StockServiceImpl;
 

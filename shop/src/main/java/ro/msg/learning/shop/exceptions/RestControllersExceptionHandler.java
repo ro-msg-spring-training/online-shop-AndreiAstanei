@@ -1,6 +1,7 @@
 package ro.msg.learning.shop.exceptions;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,14 @@ public class RestControllersExceptionHandler extends ResponseEntityExceptionHand
     protected ResponseEntity<Object> handleProductNotCreatedException(ProductNotCreatedException ex) {
         ApiError apiError = new ApiError(HttpStatus.CONFLICT);
         apiError.setMessage(ex.getMessage());
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    protected ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage("Could not find any records for the given search data!");
 
         return buildResponseEntity(apiError);
     }

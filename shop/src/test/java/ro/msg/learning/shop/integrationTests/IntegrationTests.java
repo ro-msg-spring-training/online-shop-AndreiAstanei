@@ -14,7 +14,7 @@ import ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity;
 import ro.msg.learning.shop.entities.Order;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
 import ro.msg.learning.shop.orderStrategies.OrderPlacingStrategiesInterface;
-import ro.msg.learning.shop.repositories.OrderRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderRepository;
 
 import java.util.ArrayList;
 import java.util.List;

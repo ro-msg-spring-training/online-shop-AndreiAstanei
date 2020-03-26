@@ -10,8 +10,8 @@ import ro.msg.learning.shop.entities.Location;
 import ro.msg.learning.shop.entities.Order;
 import ro.msg.learning.shop.entities.Revenue;
 import ro.msg.learning.shop.mappers.RevenueMapper;
-import ro.msg.learning.shop.repositories.OrderRepository;
-import ro.msg.learning.shop.repositories.RevenueRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderRepository;
+import ro.msg.learning.shop.repositories.jpaBasedRepositories.RevenueRepository;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
