@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ro.msg.learning.shop.entities.Product;
-import ro.msg.learning.shop.repositories.jpaBasedRepositories.ProductCategoryRepository;
+import ro.msg.learning.shop.repositories.jdbcBasedRepositories.JDBCBasedProductCategoryRepository;
 import ro.msg.learning.shop.repositories.jpaBasedRepositories.SupplierRepository;
 
 import java.sql.ResultSet;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 @Component
 @RequiredArgsConstructor
 public class ProductRowMapper implements RowMapper<Product> {
-    private final ProductCategoryRepository productCategoryRepository;
+    private final JDBCBasedProductCategoryRepository productCategoryRepository;
     private final SupplierRepository supplierRepository;
 
     @Override

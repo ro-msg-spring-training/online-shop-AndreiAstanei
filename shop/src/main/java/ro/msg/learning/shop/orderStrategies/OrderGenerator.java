@@ -10,6 +10,7 @@ import ro.msg.learning.shop.dtos.orderDto.ProcessedOrderProduct;
 import ro.msg.learning.shop.entities.*;
 import ro.msg.learning.shop.mappers.LocationMapper;
 import ro.msg.learning.shop.mappers.OrderMapper;
+import ro.msg.learning.shop.repositories.jdbcBasedRepositories.JDBCBasedProductRepository;
 import ro.msg.learning.shop.repositories.jpaBasedRepositories.*;
 
 import java.time.LocalDateTime;
@@ -41,9 +42,9 @@ public class OrderGenerator {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
     @Autowired
-    private ProductRepository productRepository;
+    private JDBCBasedProductRepository productRepository;
 
-    protected Order placeOrder(List<ProcessedOrderProduct> readyToBeProccessedProducts, OrderDTOInput inputData) {
+    protected Order placeOrder(List<ProcessedOrderProduct> readyToBeProcessedProducts, OrderDTOInput inputData) {
         Order responseOrder;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Integer offset = ZonedDateTime.now().getOffset().getTotalSeconds() / 60; // Local timezone offset for server(UTC)
@@ -56,7 +57,7 @@ public class OrderGenerator {
 
         // *** Setting the locations for the order
         Set<Location> orderLocation = new HashSet<>();
-        readyToBeProccessedProducts.forEach(item -> {
+        readyToBeProcessedProducts.forEach(item -> {
             if (locationRepository.findById(item.getLocationId()).isPresent()) {
                 orderLocation.add(locationRepository.findById(item.getLocationId()).get());
             }
@@ -82,7 +83,7 @@ public class OrderGenerator {
         responseOrder = orderRepository.save(finalUserOrder);
 
         // *** Updating the stocks in the database
-        readyToBeProccessedProducts.forEach(item -> {
+        readyToBeProcessedProducts.forEach(item -> {
             Stock stock = stockRepository.findByLocation_IdAndProduct_Id(item.getLocationId(), item.getProductId());
             stock.setQuantity(stock.getQuantity() - item.getProductQuantity());
             stockRepository.save(stock);
@@ -90,7 +91,7 @@ public class OrderGenerator {
 
         // *** Creating the required entries in the order history table
         Order finalResponseOrder = responseOrder;
-        readyToBeProccessedProducts.forEach(item -> {
+        readyToBeProcessedProducts.forEach(item -> {
             Product tempProduct = new Product();
             if (productRepository.findById(item.getProductId()).isPresent()) {
                 tempProduct = productRepository.findById(item.getProductId()).get();
