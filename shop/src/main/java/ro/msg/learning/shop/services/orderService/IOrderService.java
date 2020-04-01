@@ -1,4 +1,4 @@
-package ro.msg.learning.shop.services;
+package ro.msg.learning.shop.services.orderService;
 
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;

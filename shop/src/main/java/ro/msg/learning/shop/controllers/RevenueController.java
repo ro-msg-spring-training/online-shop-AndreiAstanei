@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ro.msg.learning.shop.dtos.RevenueDto.RevenueDTOInput;
 import ro.msg.learning.shop.dtos.RevenueDto.RevenueDTOOutput;
-import ro.msg.learning.shop.services.RevenueService;
+import ro.msg.learning.shop.services.revenueService.RevenueService;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package ro.msg.learning.shop.services;
+package ro.msg.learning.shop.services.securityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

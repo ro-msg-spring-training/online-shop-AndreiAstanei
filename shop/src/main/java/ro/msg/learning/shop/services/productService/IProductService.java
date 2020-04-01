@@ -1,4 +1,4 @@
-package ro.msg.learning.shop.services;
+package ro.msg.learning.shop.services.productService;
 
 import ro.msg.learning.shop.dtos.productDto.ProductDTO;
 import ro.msg.learning.shop.exceptions.ProductNotCreatedException;

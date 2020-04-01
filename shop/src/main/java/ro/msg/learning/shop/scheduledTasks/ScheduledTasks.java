@@ -3,7 +3,7 @@ package ro.msg.learning.shop.scheduledTasks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ro.msg.learning.shop.services.RevenueService;
+import ro.msg.learning.shop.services.revenueService.RevenueService;
 
 @Component
 @RequiredArgsConstructor

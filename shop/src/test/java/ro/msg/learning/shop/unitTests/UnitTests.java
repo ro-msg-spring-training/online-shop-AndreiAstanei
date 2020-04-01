@@ -19,8 +19,8 @@ import ro.msg.learning.shop.orderStrategies.OrderPlacingStrategiesInterface;
 import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderDetailRepository;
 import ro.msg.learning.shop.repositories.jpaBasedRepositories.OrderRepository;
 import ro.msg.learning.shop.repositories.jpaBasedRepositories.StockRepository;
-import ro.msg.learning.shop.services.OrderServiceImpl;
-import ro.msg.learning.shop.services.StockServiceImpl;
+import ro.msg.learning.shop.services.orderService.OrderServiceImpl;
+import ro.msg.learning.shop.services.stocksService.StockServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

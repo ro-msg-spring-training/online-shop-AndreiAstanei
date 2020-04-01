@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
-import ro.msg.learning.shop.services.OrderServiceImpl;
+import ro.msg.learning.shop.services.orderService.OrderServiceImpl;
 
 import java.util.List;
 

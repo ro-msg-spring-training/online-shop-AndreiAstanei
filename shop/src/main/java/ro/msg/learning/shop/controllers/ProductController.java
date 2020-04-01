@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ro.msg.learning.shop.dtos.productDto.ProductDTO;
 import ro.msg.learning.shop.exceptions.ProductNotCreatedException;
 import ro.msg.learning.shop.exceptions.ProductNotFoundException;
-import ro.msg.learning.shop.services.ProductServiceImpl;
+import ro.msg.learning.shop.services.productService.ProductServiceImpl;
 
 import javax.validation.Valid;
 import java.util.List;

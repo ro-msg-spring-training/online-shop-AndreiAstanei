@@ -9,8 +9,8 @@ import ro.msg.learning.shop.dtos.orderDto.OrderDTOInput;
 import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
 import ro.msg.learning.shop.dtos.stockDto.StockDTOOutput;
 import ro.msg.learning.shop.exceptions.OrderPlacingException;
-import ro.msg.learning.shop.services.OrderServiceImpl;
-import ro.msg.learning.shop.services.StockServiceImpl;
+import ro.msg.learning.shop.services.orderService.OrderServiceImpl;
+import ro.msg.learning.shop.services.stocksService.StockServiceImpl;
 
 import java.util.List;
 

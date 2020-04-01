@@ -1,4 +1,4 @@
-package ro.msg.learning.shop.services;
+package ro.msg.learning.shop.services.orderService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ro.msg.learning.shop.dtos.stockDto.StockDTOOutput;
-import ro.msg.learning.shop.services.StockServiceImpl;
+import ro.msg.learning.shop.services.stocksService.StockServiceImpl;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
