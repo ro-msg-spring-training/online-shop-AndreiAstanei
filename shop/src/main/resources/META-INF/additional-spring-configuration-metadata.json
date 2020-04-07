@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "order_selection_strategy",
+      "type": "ro.msg.learning.shop.orderStrategies.OrderStrategiesEnum",
+      "description": "Description for order_selection_strategy."
+    },
+    {
+      "name": "security_option",
+      "type": "ro.msg.learning.shop.security.SecurityOptions",
+      "description": "Description for security_option."
+    },
+    {
+      "name": "directions_route_matrix_api_key",
+      "type": "java.lang.String",
+      "description": "Description for directions_route_matrix_api_key."
+    },
+    {
+      "name": "schedule_cron_expression",
+      "type": "java.lang.String",
+      "description": "Description for schedule_cron_expression."
+    }
+  ]
+}
