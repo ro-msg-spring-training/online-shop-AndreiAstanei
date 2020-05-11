@@ -41,11 +41,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .and()
                     .httpBasic();
         } else {
-            httpSecurity.csrf().disable()
-                    .authorizeRequests().antMatchers("/login*").permitAll()
+            httpSecurity
+                    .authorizeRequests()
+                    .antMatchers("/resources/templates/**", "/display-products**", "/shopping-cart**")
+                    .permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .formLogin()
+                    .loginPage("/login").permitAll()
+                    .successForwardUrl("/display-products/")
                     .and()
                     .logout().permitAll().logoutSuccessUrl("/login")
                     .deleteCookies("JSESSIONID");

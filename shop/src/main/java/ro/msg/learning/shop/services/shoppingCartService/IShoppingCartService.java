@@ -1,14 +1,23 @@
 package ro.msg.learning.shop.services.shoppingCartService;
 
-import ro.msg.learning.shop.dtos.orderDto.OrderDTOOutput;
-import ro.msg.learning.shop.entities.mongoDbDocuments.ShoppingCart;
+import org.springframework.security.core.userdetails.UserDetails;
+import ro.msg.learning.shop.dtos.productDto.ProductDTO;
+import ro.msg.learning.shop.entities.shoppingCartEntities.ShoppingCart;
+
+import java.util.List;
 
 public interface IShoppingCartService {
-    ShoppingCart getCustomerCartById(Integer customerId);
+    List<ProductDTO> getAllProducts();
 
-    ShoppingCart addProductToCustomerCart(String cartId, Integer productId, Integer productQuantity);
+    UserDetails getAuthenticatedUserDetails();
 
-    ShoppingCart decreaseProductQuantityFromCustomerCart(String cartId, Integer productId);
+    boolean addProductToCart(Integer productId);
 
-    OrderDTOOutput placeOrder(String cartId);
+    ShoppingCart getCustomerShoppingCart();
+
+    void decreaseProductQuantity(Integer productId);
+
+    void increaseProductQuantity(Integer productId);
+
+    void deleteProductFromCart(Integer productId);
 }

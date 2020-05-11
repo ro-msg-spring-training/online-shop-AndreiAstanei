@@ -1,0 +1,12 @@
+Order details
+Dear [(${order.customerName})], here are the details for your last order.
+
+Address
+[(${order.getDeliveryAddress().getStreetAddress()})]
+[(${order.getDeliveryAddress().getCity() + ', ' + order.getDeliveryAddress().getCounty() + ', ' + order.getDeliveryAddress().getCountry()})]
+
+Ordered on
+[(${order.getOrderCreationTime()})]
+
+Product | Category | Quantity | Price
+[(${order.productListItemList})]

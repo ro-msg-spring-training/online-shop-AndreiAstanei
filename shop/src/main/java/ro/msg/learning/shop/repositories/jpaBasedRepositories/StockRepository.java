@@ -32,4 +32,10 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
             value = "select new ro.msg.learning.shop.dtos.orderDto.SimpleProductQuantity(st.product.id, st.quantity) from Stock as st where st.location.id = :locationId"
     )
     List<SimpleProductQuantity> getSPQListFromCurrentLocationStocks(@Param("locationId") Integer locationId);
+
+    @Query(
+            nativeQuery = true,
+            value = "select sum(st.quantity) from stock st where st.product_id = :productId"
+    )
+    Integer getTotalQuantityForProduct(@Param("productId") Integer productId);
 }

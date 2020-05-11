@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <title>Order status</title>
+
+    <style>
+        .statusText {
+            font-weight: bolder;
+            font-size: large;
+        }
+
+        .navbar-margin-fix {
+            margin-top: 5rem;
+        }
+
+        .red {
+            color: rgb(215, 22, 22);
+        }
+
+        .green {
+            color: rgb(37, 227, 15);
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" th:href="@{/display-products}">
+            <img alt="" class="d-inline-block align-top" height="30"
+                 src="https://miro.medium.com/max/624/1*dwa1SCG85BAzQttURVUvrA.png" width="30">
+            Spring
+        </a>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-target="#navbarSupportedContent" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/display-products}">Products <span
+                            class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/shopping-cart}">Shopping cart</a>
+                </li>
+            </ul>
+        </div>
+        <form class="form-group" th:action="@{/logout}" th:method="post">
+            <input class="btn btn-light" type="submit" value="Logout"/>
+        </form>
+    </nav>
+
+    <div class="container navbar-margin-fix" id="">
+        <div class="row align-items-center align-self-center">
+            <p class="green statusText col" th:if="${operationStatus == true}">Order placed successfully!</p>
+            <p class="red statusText col" th:unless="${operationStatus == true}">Order not placed!</p>
+        </div>
+
+        <a class="btn btn-light" th:href="@{/display-products}"><i class="fa fa-list-ul"></i> Back to products</a>
+    </div>
+
+</div>
+<!-- JavaScript for Bootstrap -->
+<script crossorigin="anonymous"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>

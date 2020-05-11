@@ -19,6 +19,11 @@
       "name": "schedule_cron_expression",
       "type": "java.lang.String",
       "description": "Description for schedule_cron_expression."
+    },
+    {
+      "name": "email_subject_order_summary",
+      "type": "java.lang.String",
+      "description": "Description for email_subject_order_summary."
     }
   ]
 }

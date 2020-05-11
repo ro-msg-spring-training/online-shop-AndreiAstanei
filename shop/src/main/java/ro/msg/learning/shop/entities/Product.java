@@ -1,6 +1,7 @@
 package ro.msg.learning.shop.entities;
 
 import lombok.*;
+import ro.msg.learning.shop.entities.shoppingCartEntities.ShoppingCartItem;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"orderDetails", "stocks"})
+@ToString(exclude = {"orderDetails", "stocks", "shoppingCartItems"})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +37,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<Stock> stocks;
+
+    @OneToMany(mappedBy = "product")
+    private List<ShoppingCartItem> shoppingCartItems;
 }

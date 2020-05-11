@@ -205,26 +205,36 @@ insert into Revenue (id, date, sum, location_id)
 values (10, '2020-03-18', 180.03, 3);
 
 -- Inserting data into Order_ Table
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (1, 'Kuala Lumpur', 'Malaysia', 'MY', '4 Graedel Court', '2020-02-03 00:00:00', 1);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (2, 'Araci', 'Brazil', 'BR', '3219 Victoria Circle', '2020-02-03 00:00:00', 2);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (3, 'Ciheras', 'Indonesia', 'ID', '3897 Fieldstone Circle', '2020-02-03 00:00:00', 3);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (4, 'Sahagún', 'Colombia', 'CO', '99007 Nancy Center', '2020-02-03 00:00:00', 4);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (5, 'Rače', 'Slovenia', 'SI', '3052 Menomonie Plaza', '2020-02-03 00:00:00', 5);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (6, 'Sierpc', 'Poland', 'PL', '5 Reindahl Lane', '2020-02-03 00:00:00', 6);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (7, 'Quiruvilca', 'Peru', 'PE', '525 Grayhawk Point', '2020-02-03 00:00:00', 7);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (8, 'El Corozo', 'Venezuela', 'VE', '5 Rigney Plaza', '2020-02-03 00:00:00', 8);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (9, 'Daqiao', 'China', 'CN', '3 Dorton Alley', '2020-02-03 00:00:00', 9);
-insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at, customer_id)
-values (10, 'Porto Real', 'Brazil', 'BR', '3263 Pearson Avenue', '2020-02-03 00:00:00', 10);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (1, 'Kuala Lumpur', 'Malaysia', 'MY', '4 Graedel Court', '2020-02-03 00:00:00', -120, 1);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (2, 'Araci', 'Brazil', 'BR', '3219 Victoria Circle', '2020-02-03 00:00:00', -120, 2);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (3, 'Ciheras', 'Indonesia', 'ID', '3897 Fieldstone Circle', '2020-02-03 00:00:00', -120, 3);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (4, 'Sahagún', 'Colombia', 'CO', '99007 Nancy Center', '2020-02-03 00:00:00', -120, 4);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (5, 'Rače', 'Slovenia', 'SI', '3052 Menomonie Plaza', '2020-02-03 00:00:00', -120, 5);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (6, 'Sierpc', 'Poland', 'PL', '5 Reindahl Lane', '2020-02-03 00:00:00', -120, 6);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (7, 'Quiruvilca', 'Peru', 'PE', '525 Grayhawk Point', '2020-02-03 00:00:00', -120, 7);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (8, 'El Corozo', 'Venezuela', 'VE', '5 Rigney Plaza', '2020-02-03 00:00:00', -120, 8);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (9, 'Daqiao', 'China', 'CN', '3 Dorton Alley', '2020-02-03 00:00:00', -120, 9);
+insert into Order_ (id, address_city, address_country, address_county, address_street_address, created_at,
+                    order_timestamp, customer_id)
+values (10, 'Porto Real', 'Brazil', 'BR', '3263 Pearson Avenue', '2020-02-03 00:00:00', -120, 10);
 
 -- Inserting data into Order_Detail Table
 insert into Order_Detail (id, quantity, order_id, product_id)
