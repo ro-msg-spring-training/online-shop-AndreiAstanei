@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .authorizeRequests().anyRequest().authenticated()
                     .and()
                     .httpBasic();
-        } else {
+        } else if (securityOption == SecurityOptions.FORM_SECURITY) {
             httpSecurity
                     .authorizeRequests()
                     .antMatchers("/resources/templates/**", "/display-products**", "/shopping-cart**")
@@ -53,6 +53,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .and()
                     .logout().permitAll().logoutSuccessUrl("/login")
                     .deleteCookies("JSESSIONID");
+        } else {
+            httpSecurity
+                    .authorizeRequests()
+                    .anyRequest().authenticated()
+                    .and()
+                    .oauth2Login();
         }
     }
 }
